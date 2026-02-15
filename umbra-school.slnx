@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Umbra.School.Data/Umbra.School.Data.csproj" />
+  <Project Path="Umbra.School/Umbra.School.csproj" />
+</Solution>

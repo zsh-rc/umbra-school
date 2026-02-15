@@ -1,0 +1,11 @@
+cd Umbra.School
+
+dotnet ef migrations add InitializeIdenityTables --project ../Umbra.School.Data
+dotnet ef database update --project ../Umbra.School.Data
+
+dotnet ef migrations remove --project ../Umbra.School.Data
+
+
+dotnet tool install --global dotnet-ef
+dotnet tool update --global dotnet-ef
+dotnet ef
