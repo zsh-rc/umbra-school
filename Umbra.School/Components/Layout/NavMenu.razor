@@ -2,27 +2,35 @@
 
 @inject NavigationManager NavigationManager
 
-<MudNavMenu>
+<MudNavMenu Rounded="true" Bordered="true" Margin="Margin.Normal">
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add">Counter</MudNavLink>
-    
-    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Weather</MudNavLink>
-
-    <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Lock">Auth Required</MudNavLink>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">@context.User.Identity?.Name</MudNavLink>
+            <MudNavLink Href="/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="英语背单词">英语背单词</MudNavLink>
+            <MudNavLink Href="/english/phases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="英语词组">英语词组</MudNavLink>
+            <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="英语翻译">英语翻译</MudNavLink>
+            <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="英语时文阅读">英语时文阅读</MudNavLink>
+            <MudNavLink Href="/chinese/classicals" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks" title="语文实词">语文实词</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+    <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add" Class="d-none">Counter</MudNavLink>
+    <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List" Class="d-none">Weather</MudNavLink>
+    <MudNavLink Href="auth" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Lock" Class="d-none">Auth Required</MudNavLink>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavLink Href="Account/Manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person" Class="d-none">@context.User.Identity?.Name</MudNavLink>
             <form action="Account/Logout" method="post">
                 <AntiforgeryToken />
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                <button type="submit" class="mud-nav-link mud-ripple">
+                <button type="submit" class="mud-nav-link mud-ripple d-none">
                     <MudIcon Icon="@Icons.Material.Filled.Logout" Color="MudBlazor.Color.Info" Class="mr-3"></MudIcon> Logout
                 </button>
             </form>
         </Authorized>
         <NotAuthorized>
-            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person">Register</MudNavLink>
-            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password">Login</MudNavLink>
+            <MudNavLink Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Person" Class="d-none">Register</MudNavLink>
+            <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password" Class="d-none">Login</MudNavLink>
         </NotAuthorized>
     </AuthorizeView>
 </MudNavMenu>

@@ -1,0 +1,83 @@
+﻿@implements IDisposable
+@inject LayoutStateService LayoutStateService
+@inject NavigationManager NavigationManager
+
+<MudToolBar Class="pa-0 mb-0" Style="width:100%;">
+    <MudText Typo="Typo.h5">
+        <MudElement HtmlTag="a"
+                    Class="ms-1"
+                    Style="color:#FF5734;font-weight:bold;"
+                    href="/"
+                    target="blank"
+                    rel="noopener noreferrer">
+            Umbra
+        </MudElement>School
+    </MudText>
+    <MudSpacer />
+    <MudSpacer />
+    <MudSpacer />
+    <MudTextField T="string" Label="Search" Clearable="true" Underline="false"
+                  Variant="Variant.Filled" style="border-radius: 30px; "
+                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary"></MudTextField>
+    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+    <AuthorizeView>
+        <Authorized>
+            <MudMenu>
+                <ActivatorContent>
+                    <MudAvatar Color="MudBlazor.Color.Primary">
+                        @((context.User.Identity?.Name)?.Substring(0, 1)?.ToUpper())
+                    </MudAvatar>
+                </ActivatorContent>
+                <ChildContent>
+                    <MudMenuItem Label="Profile" />
+                    <MudMenuItem Label="Switch Account" />
+                    <MudMenuItem Label="Logout" OnClick="Logout" />
+                </ChildContent>
+            </MudMenu>
+            <form action="Account/Logout" method="post">
+                <AntiforgeryToken />
+                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                <MudIconButton Icon="@Icons.Material.Filled.Logout" ButtonType="ButtonType.Submit"></MudIconButton>
+            </form>
+        </Authorized>
+        <NotAuthorized>
+            <MudIconButton Icon="@Icons.Material.Filled.Login" OnClick="Login"></MudIconButton>
+        </NotAuthorized>
+    </AuthorizeView>
+    @if (RendererInfo.IsInteractive)
+    {
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
+                       OnClick="LayoutStateService.ToggleTheme" />
+        <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="MudBlazor.Color.Inherit" />
+    }          
+</MudToolBar>
+
+@code {
+    private string? currentUrl;
+    protected override void OnInitialized()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    void Logout()
+    {
+        NavigationManager.NavigateTo("/Account/Logout", forceLoad: true);
+    }
+
+    void Login()
+    {
+        NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
+    }
+}

@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using Umbra.School.Components;
 using Umbra.School.Components.Account;
 using Umbra.School.Data;
+using Umbra.School.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +43,10 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+//  Zach 15-Feb-26:
+// - Layout state management service
+builder.Services.AddScoped<LayoutStateService>();
 
 var app = builder.Build();
 
