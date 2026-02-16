@@ -6,10 +6,18 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
     <AuthorizeView>
         <Authorized>
-            <MudNavLink Href="/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="英语背单词">英语背单词</MudNavLink>
-            <MudNavLink Href="/english/phases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="英语词组">英语词组</MudNavLink>
-            <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="英语翻译">英语翻译</MudNavLink>
-            <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="英语时文阅读">英语时文阅读</MudNavLink>
+            <MudNavGroup Title="英语课程" Expanded="false" Icon="@Icons.Material.Filled.Book">
+                <MudNavLink Href="/english/words/a" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
+                <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组">高中词组</MudNavLink>
+                <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译">语句翻译</MudNavLink>
+                <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读">时文阅读</MudNavLink>
+                <MudNavGroup Title="水平测试" Expanded="false" Icon="@Icons.Material.Filled.Assessment">
+                    <MudNavLink Href="/english/assessment/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">词汇专项测试</MudNavLink>
+                    <MudNavLink Href="/english/assessment/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试">词组专项测试</MudNavLink>
+                    <MudNavLink Href="/english/assessment/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试">综合测试</MudNavLink>
+                </MudNavGroup>
+            </MudNavGroup>
+
             <MudNavLink Href="/chinese/classicals" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks" title="语文实词">语文实词</MudNavLink>
         </Authorized>
     </AuthorizeView>

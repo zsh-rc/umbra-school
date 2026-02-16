@@ -1,11 +1,18 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Umbra.School.Data.Chinese;
+using Umbra.School.Data.English;
 
 namespace Umbra.School.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
 {
+    public DbSet<EnglishWord> EnglishWords { get; set; }
+    public DbSet<EnglishPhrase> EnglishPhrases { get; set; }
+    public DbSet<EnglishTranslation> EnglishTranslations { get; set; }
+    public DbSet<ChineseClassicalQuestion> ChineseClassicalQuestions { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

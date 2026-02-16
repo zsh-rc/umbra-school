@@ -1,7 +1,106 @@
 ﻿@page "/english/words"
+@page "/english/words/{alphabet}"
+@attribute [Authorize]
+@using Umbra.School.Models
+@using Umbra.School.Models.English
+@inject IEnglishService EnglishService
 
-<h3>Words</h3>
+<style>
+    .mud-toolbar {
+        justify-content: center;
+    }
+</style>
+
+<MudPaper Elevation="0" Class="transparent-bg max-w-body pa-0">
+    <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+        <MudToolBar Dense="true">
+            <MudText Typo="Typo.h6" Style="font-weight:bold;">英语单词（共@(_totalItems)个）</MudText>
+            <MudSpacer />
+            <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                       StartIcon="@Icons.Material.Filled.Newspaper">水平测试</MudButton>
+            <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                       StartIcon="@Icons.Material.Filled.LibraryBooks">生词本/备忘薄</MudButton>
+            <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                       StartIcon="@Icons.Material.Filled.BarChart">统计分析</MudButton>
+        </MudToolBar>
+        <MudDivider DividerType="DividerType.FullWidth" />
+    </MudPaper>
+
+    <MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_items" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none">
+        <ToolBarContent>
+            @{
+                var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+                foreach (var letter in alphabets)
+                {
+                    <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{letter.ToString().ToLower()}")"
+                             Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                }
+                <MudChip T="string" Variant="@(string.IsNullOrEmpty(alphabet) ? Variant.Filled : Variant.Text)" Href="/english/words"
+                         Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">All</MudChip>
+            }
+        </ToolBarContent>
+        <NoRecordsContent>
+            <MudText Typo="Typo.body1">没有任何记录。</MudText>
+        </NoRecordsContent>
+        <Columns>
+            <TemplateColumn CellClass="d-flex justify-end" Title="英文单词">
+                <CellTemplate>
+                    <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>&nbsp;
+                    <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>&nbsp;
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="@MudBlazor.Size.Small"></MudIconButton>
+                </CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn Property="x => x.Meaning" Title="中文释义" Editable="false"></PropertyColumn>
+            <TemplateColumn CellClass="d-flex justify-end" Title="生疏->熟练">
+                <CellTemplate>
+                    <MudStack Row>
+                        <MudRating Size="@MudBlazor.Size.Small" Color="@MudBlazor.Color.Surface" />
+                        <MudButton Size="@MudBlazor.Size.Small" Variant="@Variant.Filled"
+                                   Color="@MudBlazor.Color.Default" StartIcon="@Icons.Material.Filled.Add"
+                                   Style="white-space: nowrap">备忘</MudButton>
+                    </MudStack>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+</MudPaper>
+
+<script>
+    function playVoice(word) {
+        const url = "https://dict.youdao.com/dictvoice?audio="+word+"&type=2";
+        const audio = new Audio(url);
+        audio.play();
+    }
+</script>
 
 @code {
+    [Parameter]
+    public string? alphabet { get; set; }
 
+    MudDataGrid<EnglishWordModel> _dataGrid = new MudDataGrid<EnglishWordModel>();
+    List<EnglishWordModel> _items { get; set; } = new List<EnglishWordModel>();
+    int _totalItems = 0;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadData();
+        StateHasChanged();
+    }
+
+    async Task LoadData()
+    {
+        ResponseModel<List<EnglishWordModel>>? result;
+        if (!string.IsNullOrEmpty(alphabet))
+            result = await EnglishService.GetEnglishWordsByAlphabet(alphabet);
+        else
+            result = await EnglishService.GetEnglishWords();
+        if (result == null) return;
+        if (result.Success)
+        {
+            _items = result.Data ?? new List<EnglishWordModel>();
+            _totalItems = _items.Count;
+        }
+        // else
+        //     SnackbarService.ShowError(result.Message);
+    }
 }

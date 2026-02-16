@@ -6,6 +6,7 @@ using Umbra.School.Components;
 using Umbra.School.Components.Account;
 using Umbra.School.Data;
 using Umbra.School.Services;
+using Umbra.School.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,11 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 //  Zach 15-Feb-26:
 // - Layout state management service
 builder.Services.AddScoped<LayoutStateService>();
+// - Automapper
+builder.Services.AddAutoMapper(options => { }, typeof(AutoMapperProfile));
+
+// Zach 15-Feb-26: Register application services
+builder.Services.AddScoped<IEnglishService, EnglishService>();
 
 var app = builder.Build();
 
