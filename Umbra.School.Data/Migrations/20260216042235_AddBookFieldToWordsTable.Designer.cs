@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbra.School.Data;
 
@@ -11,9 +12,11 @@ using Umbra.School.Data;
 namespace Umbra.School.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216042235_AddBookFieldToWordsTable")]
+    partial class AddBookFieldToWordsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,7 +287,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChineseClassicalQuestions", (string)null);
+                    b.ToTable("ChineseClassicalQuestions");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishPhrase", b =>
@@ -306,7 +309,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishPhrases", (string)null);
+                    b.ToTable("EnglishPhrases");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishTranslation", b =>
@@ -328,7 +331,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishTranslations", (string)null);
+                    b.ToTable("EnglishTranslations");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishWord", b =>
@@ -354,35 +357,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishWords", (string)null);
-                });
-
-            modelBuilder.Entity("Umbra.School.Data.PersonalData.UserEnglishWordRating", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("LastReviewed")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<Guid>("WordId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("WordId");
-
-                    b.ToTable("UserEnglishWordRatings", (string)null);
+                    b.ToTable("EnglishWords");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -449,7 +424,7 @@ namespace Umbra.School.Migrations
 
                             b1.HasKey("IdentityUserPasskeyCredentialId");
 
-                            b1.ToTable("UserPasskeys", (string)null);
+                            b1.ToTable("UserPasskeys");
 
                             b1
                                 .ToJson("Data")
@@ -485,25 +460,6 @@ namespace Umbra.School.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Umbra.School.Data.PersonalData.UserEnglishWordRating", b =>
-                {
-                    b.HasOne("Umbra.School.Data.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Umbra.School.Data.English.EnglishWord", "EnglishWord")
-                        .WithMany()
-                        .HasForeignKey("WordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("EnglishWord");
                 });
 #pragma warning restore 612, 618
         }

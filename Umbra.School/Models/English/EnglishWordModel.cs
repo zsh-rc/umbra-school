@@ -9,5 +9,6 @@ namespace Umbra.School.Models.English
         [Required]
         public string Meaning { get; set; } = string.Empty;
         public string? Remark { get; set; }
+        public int Rating { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@page "/english/words"
-@page "/english/words/{alphabet}"
+@page "/english/words/{book}"
+@page "/english/words/{book}/{alphabet}"
 @attribute [Authorize]
 @using Umbra.School.Models
 @using Umbra.School.Models.English
@@ -14,7 +15,7 @@
 <MudPaper Elevation="0" Class="transparent-bg max-w-body pa-0">
     <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
         <MudToolBar Dense="true">
-            <MudText Typo="Typo.h6" Style="font-weight:bold;">英语单词（共@(_totalItems)个）</MudText>
+            <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇（共@(_totalItems) / @(_totalWordsOfBook)个）</MudText>
             <MudSpacer />
             <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                        StartIcon="@Icons.Material.Filled.Newspaper">水平测试</MudButton>
@@ -28,16 +29,18 @@
 
     <MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_items" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none">
         <ToolBarContent>
-            @{
-                var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-                foreach (var letter in alphabets)
-                {
-                    <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{letter.ToString().ToLower()}")"
-                             Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
-                }
-                <MudChip T="string" Variant="@(string.IsNullOrEmpty(alphabet) ? Variant.Filled : Variant.Text)" Href="/english/words"
-                         Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">All</MudChip>
-            }
+            <MudToolBar Dense="true">
+                @{
+                    var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+                    foreach (var letter in alphabets)
+                    {
+                        <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{book}/{letter.ToString().ToLower()}")"
+                                 Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                    }
+                }                
+                
+                <MudRating Size="@MudBlazor.Size.Medium" EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success" SelectedValueChanged="@(val => FilterByRating(val))" />
+            </MudToolBar>
         </ToolBarContent>
         <NoRecordsContent>
             <MudText Typo="Typo.body1">没有任何记录。</MudText>
@@ -54,7 +57,9 @@
             <TemplateColumn CellClass="d-flex justify-end" Title="生疏->熟练">
                 <CellTemplate>
                     <MudStack Row>
-                        <MudRating Size="@MudBlazor.Size.Small" Color="@MudBlazor.Color.Surface" />
+                        <MudRating Size="@MudBlazor.Size.Small" 
+                                   EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
+                            SelectedValue="@context.Item.Rating" SelectedValueChanged="@(val => Rating(context.Item, val))" />
                         <MudButton Size="@MudBlazor.Size.Small" Variant="@Variant.Filled"
                                    Color="@MudBlazor.Color.Default" StartIcon="@Icons.Material.Filled.Add"
                                    Style="white-space: nowrap">备忘</MudButton>
@@ -75,11 +80,29 @@
 
 @code {
     [Parameter]
+    public string? book { get; set; }
+    [Parameter]
     public string? alphabet { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState> authStateTask { get; set; }
+    private string? username;
 
     MudDataGrid<EnglishWordModel> _dataGrid = new MudDataGrid<EnglishWordModel>();
-    List<EnglishWordModel> _items { get; set; } = new List<EnglishWordModel>();
+    List<EnglishWordModel> _allItems { get; set; } = new ();
+    List<EnglishWordModel> _items { get; set; } = new();
+    int _totalWordsOfBook = 0;
     int _totalItems = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await authStateTask;
+        var user = authState.User;
+
+        if (user.Identity is { IsAuthenticated: true })
+        {
+            username = user.Identity.Name;
+        }
+    }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -89,18 +112,27 @@
 
     async Task LoadData()
     {
-        ResponseModel<List<EnglishWordModel>>? result;
-        if (!string.IsNullOrEmpty(alphabet))
-            result = await EnglishService.GetEnglishWordsByAlphabet(alphabet);
-        else
-            result = await EnglishService.GetEnglishWords();
+        if (string.IsNullOrEmpty(username)) return;
+        var result = await EnglishService.GetEnglishWordsWithRating(username, book, alphabet);
         if (result == null) return;
         if (result.Success)
         {
-            _items = result.Data ?? new List<EnglishWordModel>();
-            _totalItems = _items.Count;
+            _totalWordsOfBook = result.Data?.TotalWordsOfBook ?? 0;
+            _allItems = result.Data?.EnglishWords ?? new List<EnglishWordModel>();
+            _totalItems = _allItems.Count;
+            _items = _allItems;
         }
-        // else
-        //     SnackbarService.ShowError(result.Message);
+    }
+
+    async Task Rating(EnglishWordModel word, int val)
+    {
+        if (string.IsNullOrEmpty(username)) return;
+        var result = await EnglishService.RatingEnglishWord(username, word.Id, val);
+        StateHasChanged();
+    }
+
+    void FilterByRating(int val)
+    {
+        _items = _allItems.Where(i => i.Rating == val).OrderBy(i => i.Word).ToList();
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbra.School.Data;
 
@@ -11,9 +12,11 @@ using Umbra.School.Data;
 namespace Umbra.School.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216044115_AddUserEnglishWordsRatingTable")]
+    partial class AddUserEnglishWordsRatingTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -284,7 +287,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChineseClassicalQuestions", (string)null);
+                    b.ToTable("ChineseClassicalQuestions");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishPhrase", b =>
@@ -306,7 +309,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishPhrases", (string)null);
+                    b.ToTable("EnglishPhrases");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishTranslation", b =>
@@ -328,7 +331,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishTranslations", (string)null);
+                    b.ToTable("EnglishTranslations");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.English.EnglishWord", b =>
@@ -354,7 +357,7 @@ namespace Umbra.School.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("EnglishWords", (string)null);
+                    b.ToTable("EnglishWords");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.PersonalData.UserEnglishWordRating", b =>
@@ -382,7 +385,7 @@ namespace Umbra.School.Migrations
 
                     b.HasIndex("WordId");
 
-                    b.ToTable("UserEnglishWordRatings", (string)null);
+                    b.ToTable("UserEnglishWordRatings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -449,7 +452,7 @@ namespace Umbra.School.Migrations
 
                             b1.HasKey("IdentityUserPasskeyCredentialId");
 
-                            b1.ToTable("UserPasskeys", (string)null);
+                            b1.ToTable("UserPasskeys");
 
                             b1
                                 .ToJson("Data")

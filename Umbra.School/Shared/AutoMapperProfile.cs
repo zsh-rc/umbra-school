@@ -12,10 +12,21 @@ namespace Umbra.School.Shared
         public AutoMapperProfile()
         {
             #region English
-            CreateMap<EnglishWord, EnglishWordModel>().ReverseMap();
-            CreateProjection<EnglishWord, EnglishWordModel>();
+            //CreateMap<EnglishWord, EnglishWordModel>().ReverseMap();
+            //CreateProjection<EnglishWord, EnglishWordModel>();            
+            // Define the parameter name for use in ProjectTo
+            string userId = null;
+            CreateMap<EnglishWord, EnglishWordModel>()
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src =>
+                    src.UserRatings
+                        .Where(ur => ur.UserId == userId)
+                        .Select(ur => ur.Rating)
+                        .FirstOrDefault()));
+            CreateMap<EnglishWordModel, EnglishWord>();
+
             CreateMap<EnglishPhrase, EnglishPhraseModel>().ReverseMap();
             CreateProjection<EnglishPhrase, EnglishPhraseModel>();
+
             CreateMap<EnglishTranslation, EnglishTranslationModel>().ReverseMap();
             CreateProjection<EnglishTranslation, EnglishTranslationModel>();
             #endregion

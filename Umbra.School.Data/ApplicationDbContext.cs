@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Umbra.School.Data.Chinese;
 using Umbra.School.Data.English;
+using Umbra.School.Data.PersonalData;
 
 namespace Umbra.School.Data;
 
@@ -11,6 +12,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EnglishWord> EnglishWords { get; set; }
     public DbSet<EnglishPhrase> EnglishPhrases { get; set; }
     public DbSet<EnglishTranslation> EnglishTranslations { get; set; }
+    public DbSet<UserEnglishWordRating> UserEnglishWordRatings { get; set; }
     public DbSet<ChineseClassicalQuestion> ChineseClassicalQuestions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
