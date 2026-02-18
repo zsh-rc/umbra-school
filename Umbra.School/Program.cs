@@ -42,6 +42,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
     })
+    .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
@@ -56,6 +57,15 @@ builder.Services.AddAutoMapper(options => { }, typeof(AutoMapperProfile));
 
 // Zach 15-Feb-26: Register application services
 builder.Services.AddScoped<IEnglishService, EnglishService>();
+// Zach 17-Feb-26
+builder.Services.AddScoped<IAssessmentService, AssessmentService>();
+builder.Services.AddScoped<AppSnackbarService>();
+// Zach 18-Feb-26: Account service for user management
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+// Zach 18-Feb-26
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();
+builder.Services.AddScoped<UserProvider>();
 
 var app = builder.Build();
 

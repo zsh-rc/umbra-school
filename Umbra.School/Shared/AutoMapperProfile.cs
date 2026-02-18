@@ -1,9 +1,15 @@
 ﻿using AutoMapper;
+using Umbra.School.Data;
+using Umbra.School.Data.Assessment;
 using Umbra.School.Data.Blog;
 using Umbra.School.Data.Chinese;
 using Umbra.School.Data.English;
+using Umbra.School.Data.Notebook;
+using Umbra.School.Models.Account;
+using Umbra.School.Models.Assessment;
 using Umbra.School.Models.Chinese;
 using Umbra.School.Models.English;
+using Umbra.School.Models.Notebook;
 
 namespace Umbra.School.Shared
 {
@@ -11,6 +17,11 @@ namespace Umbra.School.Shared
     {
         public AutoMapperProfile()
         {
+            #region Account
+            CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
+            CreateProjection<ApplicationUser, ApplicationUserModel>();
+            #endregion
+
             #region English
             //CreateMap<EnglishWord, EnglishWordModel>().ReverseMap();
             //CreateProjection<EnglishWord, EnglishWordModel>();            
@@ -33,6 +44,20 @@ namespace Umbra.School.Shared
             #region Chinese
             CreateMap<ChineseClassicalQuestion, ChineseClassicalQuestionModel>().ReverseMap();
             CreateProjection<ChineseClassicalQuestion, ChineseClassicalQuestionModel>();
+            #endregion
+            #region Assessment
+            CreateMap<AssessmentInfo, AssessmentInfoModel>().ReverseMap();
+            CreateProjection<AssessmentInfo, AssessmentInfoModel>();
+            CreateMap<AssessmentResult, AssessmentResultModel>().ReverseMap();
+            CreateProjection<AssessmentResult, AssessmentResultModel>();
+            CreateMap<WordsAssessment, WordsAssessmentModel>().ReverseMap();
+            CreateProjection<WordsAssessment, WordsAssessmentModel>();
+            CreateMap<WordsAssessmentDetail, WordsAssessmentDetailModel>().ReverseMap();
+            CreateProjection<WordsAssessmentDetail, WordsAssessmentDetailModel>();
+            #endregion
+            #region Notebook
+            CreateMap<NotebookInfo, NotebookInfoModel>().ReverseMap();
+            CreateProjection<NotebookInfo, NotebookInfoModel>();
             #endregion
         }
     }

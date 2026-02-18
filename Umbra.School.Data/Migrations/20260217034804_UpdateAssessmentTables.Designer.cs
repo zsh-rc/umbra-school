@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbra.School.Data;
 
@@ -11,9 +12,11 @@ using Umbra.School.Data;
 namespace Umbra.School.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260217034804_UpdateAssessmentTables")]
+    partial class UpdateAssessmentTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -280,12 +283,6 @@ namespace Umbra.School.Migrations
                     b.Property<int>("ExpectDuration")
                         .HasColumnType("int");
 
-                    b.Property<string>("ForUserIds")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ForUserNames")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -397,24 +394,14 @@ namespace Umbra.School.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Word")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("WordId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("WordsAssessementId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("WordId");
 
                     b.HasIndex("WordsAssessementId");
 
@@ -697,7 +684,7 @@ namespace Umbra.School.Migrations
 
             modelBuilder.Entity("Umbra.School.Data.Assessment.WordsAssessment", b =>
                 {
-                    b.HasOne("Umbra.School.Data.Assessment.AssessmentInfo", "AssessmentInfo")
+                    b.HasOne("Umbra.School.Data.Assessment.AssessmentInfo", "AssessementInfo")
                         .WithMany()
                         .HasForeignKey("AssessmentInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -707,32 +694,18 @@ namespace Umbra.School.Migrations
                         .WithMany()
                         .HasForeignKey("NotebookInfoId");
 
-                    b.Navigation("AssessmentInfo");
+                    b.Navigation("AssessementInfo");
 
                     b.Navigation("NotbookInfo");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.Assessment.WordsAssessmentDetail", b =>
                 {
-                    b.HasOne("Umbra.School.Data.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.HasOne("Umbra.School.Data.English.EnglishWord", "EnglishWord")
-                        .WithMany()
-                        .HasForeignKey("WordId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Umbra.School.Data.Assessment.WordsAssessment", "WordsAssessment")
                         .WithMany()
                         .HasForeignKey("WordsAssessementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-
-                    b.Navigation("EnglishWord");
 
                     b.Navigation("WordsAssessment");
                 });

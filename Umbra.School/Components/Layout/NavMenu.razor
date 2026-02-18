@@ -12,13 +12,20 @@
                 <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译">语句翻译</MudNavLink>
                 <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读">时文阅读</MudNavLink>
                 <MudNavGroup Title="水平测试" Expanded="false" Icon="@Icons.Material.Filled.Assessment">
-                    <MudNavLink Href="/english/assessment/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">词汇专项测试</MudNavLink>
-                    <MudNavLink Href="/english/assessment/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试">词组专项测试</MudNavLink>
-                    <MudNavLink Href="/english/assessment/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试">综合测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">词汇专项测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试">词组专项测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="翻译专项测试">翻译专项测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试">综合测试</MudNavLink>
                 </MudNavGroup>
             </MudNavGroup>
-
             <MudNavLink Href="/chinese/classicals" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks" title="语文实词">语文实词</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavGroup Title="测试管理" Expanded="false" Icon="@Icons.Material.Filled.Book">
+                <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">英语词汇专项测试</MudNavLink>
+            </MudNavGroup>
         </Authorized>
     </AuthorizeView>
     <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">About</MudNavLink>

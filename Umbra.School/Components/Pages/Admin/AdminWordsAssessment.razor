@@ -1,0 +1,245 @@
+﻿@page "/admin-assessment/english/words"
+@attribute [Authorize]
+@using Umbra.School.Models.Assessment
+@using Umbra.School.Models.Account
+@inject IAccountService AccountService
+@inject IAssessmentService AssessmentService
+@inject IHttpContextAccessor HttpContextAccessor
+@inject AppSnackbarService AppSnackbarService
+@inject UserProvider UserProvider
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">英语词汇专项测试管理</MudText>
+        <MudSpacer />
+        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                   StartIcon="@Icons.Material.Filled.Newspaper">提交测试</MudButton>
+        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                   StartIcon="@Icons.Material.Filled.LibraryBooks">错题本</MudButton>
+        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+                   StartIcon="@Icons.Material.Filled.BarChart">测试分析</MudButton>
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudGrid Justify="Justify.FlexStart">
+    <MudItem xs="3">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.NewLabel">制定新的测试计划</MudButton>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton EndIcon="@Icons.Material.Filled.Add" Color="MudBlazor.Color.Primary" Variant="Variant.Filled" Disabled="@(!_planFormDisabled)" Size="MudBlazor.Size.Small" OnClick="NewPlan">制定新的测试计划</MudButton>
+                    <MudButton EndIcon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Secondary" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Disabled="@(!_planFormDisabled)">删除该计划</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudForm Model="_model" Disabled="@_planFormDisabled">
+                    <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="测试计划名称" Class="mb-2" ReadOnly />
+                    <MudField Label="范围" Variant="Variant.Outlined">
+                        <MudToggleGroup T="string" @bind-Value="_model.Scope" SelectionMode="SelectionMode.SingleSelection" Color="MudBlazor.Color.Secondary" CheckMark="true" FixedContent="true">
+                            @{
+                                foreach (var scope in _scopes)
+                                {
+                                    <MudToggleItem Value="@(scope.Key)" Text="@(scope.Value)" />
+                                }
+                            }
+                        </MudToggleGroup>
+                        <MudRadioGroup T="string" @bind-Value="_model.Source" For="@(() => _model.Source)" Required="true">
+                            <MudRadio Value="@("Library")" Size="MudBlazor.Size.Small">词库&nbsp;<a href="/english/words/@(_model.Scope)/a">🔗</a></MudRadio>
+                            <MudRadio Value="@("Unfamiliar")" Size="MudBlazor.Size.Small">生词（★&lt;=3）</MudRadio>
+                            <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio>
+                        </MudRadioGroup>
+                        <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users" Class="@($"ml-3{(_model.Source == "Library" ? " d-none" : "")}")"
+                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
+                                   Disabled="@(_model.Source == "Library")">
+                            @foreach (var user in _allUsers)
+                            {
+                                <MudSelectItem T="ApplicationUserModel" Value="@(user)">@user.UserName</MudSelectItem>
+                            }
+                        </MudSelect>
+
+                    </MudField>
+                    <MudField Label="词汇数量" Variant="Variant.Outlined">
+                        <MudRadioGroup T="Int32" @bind-Value="_model.WordCount" For="@(() => _model.WordCount)" Required="true">
+                            <MudRadio Value="30" Size="MudBlazor.Size.Small">30</MudRadio>
+                            <MudRadio Value="50" Size="MudBlazor.Size.Small">50</MudRadio>
+                            <MudRadio Value="100" Size="MudBlazor.Size.Small">100</MudRadio>
+                            <MudRadio Value="150" Size="MudBlazor.Size.Small">150</MudRadio>
+                            <MudRadio Value="200" Size="MudBlazor.Size.Small">200</MudRadio>
+                            <MudRadio Value="-1" Size="MudBlazor.Size.Small">All</MudRadio>
+                        </MudRadioGroup>
+                    </MudField>
+                    <MudField Label="出题方式" Variant="Variant.Outlined">
+                        <MudRadioGroup T="string" @bind-Value="_model.Method" For="@(() => _model.Method)" Required>
+                            <MudRadio Value="@("random")" Size="MudBlazor.Size.Small">随机</MudRadio>
+                            <MudRadio Value="@("order")" Size="MudBlazor.Size.Small">顺序</MudRadio>
+                        </MudRadioGroup>
+                        <MudNumericField T="Int32" @bind-Value="_model.StartIndex" For="@(() => _model.StartIndex)" Label="开始" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Disabled="@(_model.Method == "random")" />
+                    </MudField>
+                    <MudField Label="预期时间（分钟）" Variant="Variant.Outlined">
+                        <MudNumericField T="Int32" @bind-Value="_model.ExpectDuration" For="@(() => _model.ExpectDuration)" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Required="true" />
+                    </MudField>
+                    <MudButton EndIcon="@Icons.Material.Filled.Lightbulb" Color="MudBlazor.Color.Primary" Variant="Variant.Filled" OnClick="CreateWordsAssessment">生成测试题目</MudButton>
+                </MudForm>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem>
+        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none" Elevation="0">
+            <ToolBarContent>
+                <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.List">已有测试计划列表</MudButton>
+            </ToolBarContent>
+            <NoRecordsContent>
+                <MudText Typo="Typo.body1">尚未制定任何测试计划。</MudText>
+            </NoRecordsContent>
+            <Columns>
+                <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
+                <PropertyColumn Title="针对用户" Property="x => x.AssessmentInfo.ForUserNames" />
+                <TemplateColumn Title="删除">
+                    <CellTemplate>
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Default" Size="MudBlazor.Size.Small" />
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+</MudGrid>
+
+@code {
+    // string currentUserId = string.Empty;
+    List<ApplicationUserModel> _allUsers = new();
+    IEnumerable<ApplicationUserModel> _users = new HashSet<ApplicationUserModel>();
+
+    MudDataGrid<WordsAssessmentModel>? _dataGrid;
+    List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
+
+    bool _planFormDisabled;
+
+    Dictionary<string, string> _scopes = new Dictionary<string, string>
+    {
+        { "shsv", "上海高中词汇" },
+        { "shpsv", "上海小学词汇" }
+    };
+    Dictionary<string, string> _sources = new Dictionary<string, string>
+    {
+        { "Library", "词库" },
+        { "Unfamiliar", "生词（★<=3）" },
+        { "ErrorNotes", "以往错题"}
+    };
+    Dictionary<string, string> _methods = new Dictionary<string, string>
+    {
+        { "random", "随机" },
+        { "order", "顺序" }
+    };
+
+    WordsAssessmentModel _model = new WordsAssessmentModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        // await GetCurrentUserId();
+        await LoadWordsAssessments();
+        InitializeForm();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            await GetAllApplicationUsers();
+        }
+    }
+
+    private string GetMultiSelectionText(List<string> selectedValues)
+    {
+        return $"已选择{selectedValues.Count}个用户。";
+    }
+
+    // async Task GetCurrentUserId()
+    // {
+    //     currentUserId = (await UserProvider.GetUserAsync()).UserId;
+    // }
+
+    async Task GetAllApplicationUsers()
+    {
+        var result = await AccountService.GetAllApplicationUsers();
+        if (result != null && result.Success && result.Data != null)
+        {
+            _allUsers = result.Data;
+        }
+    }
+
+    void InitializeForm()
+    {
+        _model = new WordsAssessmentModel() // Default values
+        {
+            Id = Guid.NewGuid(),
+            Scope = "shsv",
+            Source = "Library",
+            WordCount = 30,
+            Method = "random",
+            StartIndex = -1,
+            ExpectDuration = 20
+        };
+    }
+
+    async Task LoadWordsAssessments()
+    {
+        var result = await AssessmentService.GetWordsAssessments();
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessments = result.Data.OrderBy(a => a.AssessmentInfoName).ToList();
+        }
+    }
+
+    async Task CreateWordsAssessment()
+    {
+        var username = HttpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "Unknown";
+        if (string.IsNullOrEmpty(username)) return;
+        var name = $"{DateTime.Today.ToString("yyyymmdd")} - {_scopes[_model.Scope]} » {_sources[_model.Source]}（共{_model.WordCount}）» {_methods[_model.Method]}{(_model.Method == "order" ? $"（{_model.StartIndex}→）" : "")}";
+        _model.AssessmentInfoName = name;
+        _model.StartIndex = _model.Method == "random" ? -1 : _model.StartIndex;
+        string userIds = "*", usernames = "*";
+        if (_model.Source != "Library" && _users.Count() > 0)
+        {
+            userIds = string.Join(";", _users.Select(u => u.Id).ToList());
+            usernames = string.Join(";", _users.Select(u => u.UserName).ToList());
+        }
+        _model.AssessmentInfo = new AssessmentInfoModel
+        {
+            Name = name,
+            Category = "EnglishWordsAssessment",
+            CreateDate = DateTime.Now,
+            CreatedBy = username,
+            Description = null,
+            ForUserIds = userIds,
+            ForUserNames = usernames,
+            ExpectDuration = _model.ExpectDuration
+        };
+        var result = await AssessmentService.AddWordsAssessment(_model);
+        if (result.Success)
+        {
+            _planFormDisabled = true;
+            StateHasChanged();
+            AppSnackbarService.ShowSuccess("测试已生成，可以选择下一步操作。");
+        }
+        else
+        {
+            AppSnackbarService.ShowError("测试生成失败。");
+        }
+    }
+    async Task NewPlan()
+    {
+        _planFormDisabled = false;
+        InitializeForm();
+        StateHasChanged();
+    }
+
+    async Task DeletePlan()
+    {
+
+    }
+}
