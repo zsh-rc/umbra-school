@@ -1,0 +1,9 @@
+﻿@using Umbra.School.Models.Assessment
+<h3>@Assessment.AssessmentInfoName</h3>
+
+@code {
+    [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+    [Parameter]
+    public WordsAssessmentModel? Assessment { get; set; }
+}

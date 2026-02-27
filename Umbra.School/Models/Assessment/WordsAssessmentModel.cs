@@ -11,7 +11,7 @@ namespace Umbra.School.Models.Assessment
         [Required]
         public Guid AssessmentInfoId { get; set; }
         [Required]
-        public string AssessmentInfoName {  get; set; } = string.Empty;
+        public string AssessmentInfoName { get; set; } = string.Empty;
         public AssessmentInfoModel AssessmentInfo { get; set; } = new AssessmentInfoModel();
         [Required]
         public string Scope { get; set; } = string.Empty;
@@ -27,5 +27,7 @@ namespace Umbra.School.Models.Assessment
         public Int32 StartIndex { get; set; } = -1;
         public Int32 ExpectDuration { get; set; }
         public List<WordsAssessmentDetailModel> Details { get; set; } = new List<WordsAssessmentDetailModel>();
+        public string? UserId { get; set; }
+        public AssessmentResultModel? AssessmentResult { get; set; }
     }
 }

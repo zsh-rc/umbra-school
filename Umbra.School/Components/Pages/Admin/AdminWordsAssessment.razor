@@ -23,18 +23,18 @@
 </MudPaper>
 
 <MudGrid Justify="Justify.FlexStart">
-    <MudItem xs="3">
+    <MudItem xs="4">
         <MudCard>
-            <MudCardHeader>
+            <MudCardHeader Class="pb-0">
                 <CardHeaderContent>
-                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.NewLabel">制定新的测试计划</MudButton>
+                    <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.NewLabel" Class="mt-n3">制定测试计划</MudButton>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudButton EndIcon="@Icons.Material.Filled.Add" Color="MudBlazor.Color.Primary" Variant="Variant.Filled" Disabled="@(!_planFormDisabled)" Size="MudBlazor.Size.Small" OnClick="NewPlan">制定新的测试计划</MudButton>
-                    <MudButton EndIcon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Secondary" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Disabled="@(!_planFormDisabled)">删除该计划</MudButton>
+                    <MudButton EndIcon="@Icons.Material.Filled.Add" Color="MudBlazor.Color.Primary" Variant="Variant.Filled" Disabled="@(!_planFormDisabled)" Size="MudBlazor.Size.Small" OnClick="NewPlan">新测试计划</MudButton>
+                    <MudButton EndIcon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Secondary" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Disabled="@(!_planFormDisabled)">删除</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
-            <MudCardContent>
+            <MudCardContent Class="pt-0">
                 <MudForm Model="_model" Disabled="@_planFormDisabled">
                     <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="测试计划名称" Class="mb-2" ReadOnly />
                     <MudField Label="范围" Variant="Variant.Outlined">

@@ -13,7 +13,7 @@ namespace Umbra.School.Data.Assessment
         [Required]
         public string Category { get; set; } = string.Empty;
         [Required]
-        public Int32? ExpectDuration { get; set; }
+        public int ExpectDuration { get; set; }
         public string? Description { get; set; }
         public string? ForUserIds { get; set; }
         public string? ForUserNames { get; set; }

@@ -1,0 +1,52 @@
+﻿@using Umbra.School.Models.Assessment
+@inject IAssessmentService AssessmentService
+
+<MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
+             MultiSelection="false"SelectOnRowClick="false">
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <TemplateColumn Title="计划名称">
+            <CellTemplate>
+                <MudLink OnClick="@(() => NotifySelectedAssessment(context.Item))">@context.Item.AssessmentInfoName</MudLink>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
+        <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
+        <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
+        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
+        <PropertyColumn Title="分数" Property="x => x.AssessmentResult.Score" />
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback<WordsAssessmentModel> OnWordsAssessmentSelected { get; set; }
+
+    MudDataGrid<WordsAssessmentModel>? _dataGrid;
+    List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        await LoadWordsAssessments();
+    }
+
+    async Task LoadWordsAssessments()
+    {
+        var result = await AssessmentService.GetWordsAssessments(CurrentUserId);
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessments = result.Data;
+        }
+    }
+
+    private async Task NotifySelectedAssessment(WordsAssessmentModel selectedAssessment)
+    {
+        // This triggers the method in the parent and passes the string
+        await OnWordsAssessmentSelected.InvokeAsync(selectedAssessment);
+    }
+}

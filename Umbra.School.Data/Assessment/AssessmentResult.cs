@@ -21,10 +21,12 @@ namespace Umbra.School.Data.Assessment
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public DateTime? StartTime { get; set; }
         public DateTime? EndTime { get; set; }
+        public int? Duration { get;set;  }
         [Precision(18, 2)]
         public decimal? Score { get; set; }
         public string? Feedback { get; set; }
         public DateTime? ReviewDate { get; set; }
         public string? ReviewedBy { get; set; }
+        public string Status { get; set; } = string.Empty;
     }
 }

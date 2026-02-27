@@ -21,51 +21,118 @@
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
-<MudStepper ShowResetButton OnPreviewInteraction="OnPreviewInteraction">
-    <MudStep Title="选择一个测试计划" HasError="@(_selectedAssessment == null)">
-        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" HeaderClass="d-none" Elevation="0"
-                     MultiSelection="false" @bind-SelectedItem="_selectedAssessment">
-            <NoRecordsContent>
-                <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
-            </NoRecordsContent>
-            <Columns>
-                <SelectColumn T="WordsAssessmentModel"  />
-                <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
-            </Columns>
-        </MudDataGrid>
-    </MudStep>
-    <MudStep Title="开始测试">
-        <MudPaper Class="pa-10">
-            <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" Value="25" Class="my-7">
-                <MudText Typo="Typo.h3" Color="MudBlazor.Color.Dark">
-                    <b>1/30</b>
-                </MudText>
-            </MudProgressLinear>
-            <MudField Label="答题区" ShrinkLabel="false" Variant="Variant.Outlined" Class="justify-center" Underline="false">
-                <MudForm Class="px-20 py-10">
-                    <MudTextField T="string" Label="中文" AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" AutoGrow ReadOnly /><br /><br />
-                    <MudTextField T="string" Label="英文单词" Placeholder="在此输入正确答案后按回车键进入下一题。" AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
-                    <MudPaper Class="pa-4 mt-4" Elevation="0">
-                        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="false" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10">上一题</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="false" StartIcon="@Icons.Material.Filled.NavigateNext" Class="mr-10">下一题</MudButton>
-                        <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" DropShadow="false" StartIcon="@Icons.Material.Filled.Done" Class="mr-10">完成进入审阅</MudButton>
-                    </MudPaper>
-                </MudForm>                
+<MudTabs @ref="_tabs" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
+    <MudTabPanel Text="测试">
+        <MudStepper @ref="_stepper" ShowResetButton OnPreviewInteraction="OnPreviewInteraction">
+            <MudStep Title="选择一个测试计划" HasError="@(_selectedAssessment == null)">
+                <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
+                             MultiSelection="false" @bind-SelectedItem="_selectedAssessment" SelectOnRowClick="false">
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
+                    </NoRecordsContent>
+                    <Columns>
+                        <TemplateColumn>
+                            <CellTemplate>
+                                @if (context.Item.AssessmentResult == null || context.Item.AssessmentResult.Status == AssessmentStatus.InProgress.GetDescription())
+                                {
+                                    <MudCheckBox T="bool"
+                                                 Value="@(context.Item == _selectedAssessment)"
+                                                 ValueChanged="@((bool val) => OnRowSelectionChanged(context.Item, val))" />
+                                }
 
-            </MudField>
-        </MudPaper>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
+                        <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
+                        <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
+                        <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
+                        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
+                        <PropertyColumn Title="分数" Property="x => x.AssessmentResult.Score" />
+                    </Columns>
+                </MudDataGrid>
+            </MudStep>
+            <MudStep Title="开始测试">
+                <MudPaper Class="pa-10">
+                    <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" @bind-Value="@_progress" Class="my-5">
+                        <MudText Typo="Typo.h3" Color="MudBlazor.Color.Dark">
+                            @if (_currentQuestionIndex < _totalQuestions)
+                            {
+                                <b>@($"{_currentQuestionIndex + 1} / {_totalQuestions}")</b>
+                            }
+                            else
+                            {
+                                <b>@($"{_currentQuestionIndex} / {_totalQuestions}")</b>
+                            }
+                        </MudText>
+                    </MudProgressLinear>
+                    <MudField Label="答题区" ShrinkLabel="false" Variant="Variant.Outlined" Class="justify-center" Underline="false">
+                        <MudForm Class="px-20 py-8">
+                            <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
+                                          AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" AutoGrow ReadOnly /><br /><br />
+                            <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "new-password" } })"
+                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true" TextUpdateSuppression="false"
+                                          AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
+                            <MudPaper Class="pa-4 mt-4" Elevation="0">
+                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
+                                           Disabled="@(_currentQuestionIndex == 0)" OnClick="Previous">@(_currentQuestionIndex == 0 ? "开始":"上一题")</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateNext" Class="mr-10"
+                                           Disabled="@(_currentQuestionIndex == _totalQuestions)" OnClick="Next">@(_currentQuestionIndex == _totalQuestions ? "完成":"下一题")</MudButton>
+                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="FinishForReview"
+                                           DropShadow="true" StartIcon="@Icons.Material.Filled.Done" Class="mr-10">答题完毕进入审阅</MudButton>
+                            </MudPaper>
+                        </MudForm>
 
-    </MudStep>
-    <MudStep Title="审阅并提交">Create an ad content</MudStep>
-</MudStepper>
+                    </MudField>
+                </MudPaper>
+
+            </MudStep>
+            <MudStep Title="审阅并提交">
+                <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+                             ReadOnly="false" EditMode="DataGridEditMode.Form" EditDialogOptions="@(new DialogOptions{ FullWidth = true })"
+                             Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.body1">没有答题记录。</MudText>
+                    </NoRecordsContent>
+                    <Columns>
+                        <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
+                        <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
+                        <TemplateColumn Title="修正">
+                            <CellTemplate>
+                                <MudIconButton Size="MudBlazor.Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" Disabled="_step3Complete" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </MudDataGrid>
+            </MudStep>
+        </MudStepper>
+    </MudTabPanel>
+    <MudTabPanel Text="历史记录">
+        <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" />
+    </MudTabPanel>
+    <MudTabPanel Text="测试详细信息">
+        <WordsAssessmentDetailComponent CurrentUserId="@_currentUserId" Assessment="@_selectedAssessment" />
+    </MudTabPanel>
+</MudTabs>
 
 @code {
-    string currentUserId = string.Empty;
+    string _currentUserId = string.Empty;
+    private MudTabs _tabs = new ();
+
+    MudStepper _stepper = new();
     MudDataGrid<WordsAssessmentModel>? _dataGrid;
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
     WordsAssessmentModel? _selectedAssessment;
+    List<WordsAssessmentDetailModel> _assessmentDetails = new List<WordsAssessmentDetailModel>();
+    int _currentQuestionIndex = 0;
+    int _totalQuestions = 0;
+    double _progress = 0.0;
+    string _currentWordCn = string.Empty;
+    string? _currentAnswerEn = string.Empty;
+    MudDataGrid<WordsAssessmentDetailModel>? _reviewDataGrid;
 
     bool _step1Complete;
+    bool _step2Complete;
+    bool _step3Complete;
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,17 +143,97 @@
 
     async Task GetCurrentUserId()
     {
-        currentUserId = (await UserProvider.GetUserAsync()).UserId;
+        _currentUserId = (await UserProvider.GetUserAsync()).UserId;
     }
 
     async Task LoadWordsAssessments()
     {
-        var result = await AssessmentService.GetWordsAssessments();
+        var result = await AssessmentService.GetWordsAssessments(_currentUserId);
         if (result != null && result.Success && result.Data != null)
         {
             _assessments = result.Data;
         }
     }
+
+    void OnRowSelectionChanged(WordsAssessmentModel item, bool isSelected)
+    {
+        _selectedAssessment = isSelected ? item : null;
+    }
+
+    async Task GetWordsAssessmentDetail()
+    {
+        if (_selectedAssessment == null) return;
+        var result = await AssessmentService.GetWordsAssessmentDetail(_currentUserId, _selectedAssessment.Id);
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessmentDetails = result.Data;
+            _totalQuestions = _assessmentDetails.Count;
+            _progress = (1.0 / _totalQuestions) * 100.0;
+            var first = _assessmentDetails.FirstOrDefault();
+            if (first != null) _currentWordCn = first.Meaning;
+            StateHasChanged();
+        }
+    }
+
+    void Previous()
+    {
+        if (_currentQuestionIndex == _totalQuestions)
+        {
+            _currentQuestionIndex--;
+        }
+        _currentQuestionIndex--;
+        UpdateAnswerAndProgress();
+    }
+
+    void Next()
+    {
+        SaveAnswer();
+        _currentQuestionIndex++;
+        if (_currentQuestionIndex < _totalQuestions)
+        {
+            UpdateAnswerAndProgress();
+        }
+    }
+
+    void SaveAnswer()
+    {
+        _assessmentDetails.ElementAt(_currentQuestionIndex).Answer = _currentAnswerEn;
+    }
+
+    void UpdateAnswerAndProgress()
+    {
+        _currentWordCn = _assessmentDetails.ElementAt(_currentQuestionIndex).Meaning;
+        _currentAnswerEn = _assessmentDetails.ElementAt(_currentQuestionIndex).Answer;
+        _progress = (_currentQuestionIndex + 1) * 1.0 / _totalQuestions * 100.0;
+        StateHasChanged();
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        // Trigger "Next" on Enter
+        if (e.Key == "Enter" || (e.CtrlKey && e.Key == "ArrowRight"))
+        {
+            if (_currentQuestionIndex < _totalQuestions)
+            {
+                Next();
+            }
+        }
+        // Trigger "Previous" on Ctrl + Left Arrow
+        else if (e.CtrlKey && e.Key == "ArrowLeft")
+        {
+            if (_currentQuestionIndex > 0)
+            {
+                Previous();
+            }
+        }
+    }
+
+    private async Task FinishForReview()
+    {
+        _step2Complete = true;
+        await _stepper.NextStepAsync();
+    }
+
 
     private async Task OnPreviewInteraction(StepperInteractionEventArgs arg)
     {
@@ -100,8 +247,72 @@
             // occurrs when clicking a step header with the mouse
             await ControlStepNavigation(arg);
         }
+        else if (arg.Action == StepAction.Reset)
+        {
+            await ResetAllSteps();
+        }
     }
+
+    private async Task ResetAllSteps()
+    {
+        await LoadWordsAssessments();
+        // _selectedAssessment = null;
+        _assessmentDetails = new List<WordsAssessmentDetailModel>();
+        _currentQuestionIndex = 0;
+        _totalQuestions = 0;
+        _progress = 0.0;
+        _currentWordCn = string.Empty;
+        _currentAnswerEn = string.Empty;
+        _step1Complete = false;
+        _step2Complete = false;
+        _step3Complete = false;
+        StateHasChanged();
+    }
+
     private async Task ControlStepCompletion(StepperInteractionEventArgs arg)
+    {
+        switch (arg.StepIndex)
+        {
+            case 0:
+                if (_selectedAssessment == null)
+                {
+                    await DialogService.ShowMessageBox("信息", "请首先选择一个测试计划。");
+                    arg.Cancel = true;
+                }
+                else
+                {
+                    await AssessmentService.StartAssessment(_selectedAssessment.AssessmentInfoId, _currentUserId);
+                    await GetWordsAssessmentDetail();
+                }
+                break;
+            case 1:
+                if (!_step2Complete)
+                {
+                    await DialogService.ShowMessageBox("信息", "尚未确认答题完毕。");
+                    arg.Cancel = true;
+                }
+                break;
+            case 2:
+                if (_assessmentDetails.Count() == 0)
+                {
+                    await DialogService.ShowMessageBox("信息", "没有要提交的记录。");
+                    arg.Cancel = true;
+                }
+                var result = await AssessmentService.SubmitAssessmentAnswers(_assessmentDetails);
+                if (result.Success && result.Data)
+                {
+                    await DialogService.ShowMessageBox("信息", "已完成提交。");
+                }
+                else
+                {
+                    await DialogService.ShowMessageBox("错误", "未知错误导致结果未提交。");
+                }
+                _step3Complete = true;
+                break;
+        }
+    }
+
+    private async Task ControlStepNavigation(StepperInteractionEventArgs arg)
     {
         switch (arg.StepIndex)
         {
@@ -113,27 +324,6 @@
                 }
                 break;
             case 1:
-                // if ((_step2TextInput?.Length ?? 0) == 0)
-                // {
-                //     await DialogService.ShowMessageBox("Error", "You have not entered text in step 2");
-                //     arg.Cancel = true;
-                // }
-                break;
-        }
-    }
-
-    private async Task ControlStepNavigation(StepperInteractionEventArgs arg)
-    {
-        switch (arg.StepIndex)
-        {
-            case 1:
-                if (_selectedAssessment == null)
-                {
-                    await DialogService.ShowMessageBox("信息", "请首先选择一个测试计划。");
-                    arg.Cancel = true;
-                }
-                break;
-            case 2:
                 // if (_step1Complete != true || (_step2TextInput?.Length ?? 0) == 0)
                 // {
                 //     await DialogService.ShowMessageBox("Error", "Finish step 1 and 2 first");
@@ -142,4 +332,12 @@
                 break;
         }
     }
+
+    private async Task HandleSelectedWordsAssessmentFromHistory(WordsAssessmentModel selectedAssessment)
+    {
+        _selectedAssessment = selectedAssessment;
+        await _tabs.ActivatePanelAsync(2);
+    }
+
+    
 }
