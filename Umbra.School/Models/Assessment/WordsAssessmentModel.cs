@@ -12,6 +12,7 @@ namespace Umbra.School.Models.Assessment
         public Guid AssessmentInfoId { get; set; }
         [Required]
         public string AssessmentInfoName { get; set; } = string.Empty;
+        public string ShortSummary { get; set; } = string.Empty;
         public AssessmentInfoModel AssessmentInfo { get; set; } = new AssessmentInfoModel();
         [Required]
         public string Scope { get; set; } = string.Empty;
@@ -29,5 +30,7 @@ namespace Umbra.School.Models.Assessment
         public List<WordsAssessmentDetailModel> Details { get; set; } = new List<WordsAssessmentDetailModel>();
         public string? UserId { get; set; }
         public AssessmentResultModel? AssessmentResult { get; set; }
+        public bool Repeatable { get; set; } = false;
+        public int RepeatTimes { get; set; } = 0;
     }
 }

@@ -16,7 +16,7 @@ namespace Umbra.School.Data.Assessment
         [Required]
         public Guid AssessmentInfoId { get; set; }
         [ForeignKey("AssessmentInfoId")]
-        public AssessmentInfo? AssessementInfo { get; set; }
+        public AssessmentInfo AssessementInfo { get; set; } = new AssessmentInfo();
         [Required]
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public DateTime? StartTime { get; set; }

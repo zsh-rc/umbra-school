@@ -1,5 +1,6 @@
 ﻿@using Umbra.School.Models.Assessment
 @inject IAssessmentService AssessmentService
+@inject IDialogService DialogService
 
 <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
              MultiSelection="false"SelectOnRowClick="false">
@@ -7,9 +8,14 @@
         <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
     </NoRecordsContent>
     <Columns>
-        <TemplateColumn Title="计划名称">
+@*         <TemplateColumn Title="计划名称">
             <CellTemplate>
                 <MudLink OnClick="@(() => NotifySelectedAssessment(context.Item))">@context.Item.AssessmentInfoName</MudLink>
+            </CellTemplate>
+        </TemplateColumn> *@
+        <TemplateColumn Title="计划名称">
+            <CellTemplate>
+                <MudLink OnClick="@(() => ShowDetails(context.Item))">@context.Item.AssessmentInfoName</MudLink>
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
@@ -23,8 +29,8 @@
 @code {
     [Parameter]
     public string CurrentUserId { get; set; } = string.Empty;
-    [Parameter]
-    public EventCallback<WordsAssessmentModel> OnWordsAssessmentSelected { get; set; }
+    // [Parameter]
+    // public EventCallback<WordsAssessmentModel> OnWordsAssessmentSelected { get; set; }
 
     MudDataGrid<WordsAssessmentModel>? _dataGrid;
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
@@ -44,9 +50,22 @@
         }
     }
 
-    private async Task NotifySelectedAssessment(WordsAssessmentModel selectedAssessment)
+    // private async Task NotifySelectedAssessment(WordsAssessmentModel selectedAssessment)
+    // {
+    //     // This triggers the method in the parent and passes the string
+    //     await OnWordsAssessmentSelected.InvokeAsync(selectedAssessment);
+    // }
+
+    private Task ShowDetails(WordsAssessmentModel selectedAssessment)
     {
-        // This triggers the method in the parent and passes the string
-        await OnWordsAssessmentSelected.InvokeAsync(selectedAssessment);
+        var parameters = new DialogParameters<WordsAssessmentDetailComponent>
+        {
+            { x => x.CurrentUserId, CurrentUserId },
+            { x => x.Assessment, selectedAssessment }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraLarge };
+
+        return DialogService.ShowAsync<WordsAssessmentDetailComponent>("详细信息", parameters, options);
     }
 }

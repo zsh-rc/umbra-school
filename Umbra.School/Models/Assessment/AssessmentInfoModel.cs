@@ -7,6 +7,8 @@ namespace Umbra.School.Models.Assessment
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
+        public string ShortSummary { get; set; } = string.Empty;
+        [Required]
         public string Category { get; set; } = string.Empty;
         [Required]
         public Int32 ExpectDuration { get; set; }

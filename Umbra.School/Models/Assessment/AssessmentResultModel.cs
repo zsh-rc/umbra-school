@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using Umbra.School.Data;
+using Umbra.School.Models.Account;
 
 namespace Umbra.School.Models.Assessment
 {
@@ -7,9 +9,10 @@ namespace Umbra.School.Models.Assessment
     {
         [Required]
         public string UserId { get; set; } = Guid.NewGuid().ToString();
+        public ApplicationUserModel ApplicationUser { get; set; } = new();
         [Required]
         public Guid AssessmentInfoId { get; set; }
-        public AssessmentInfoModel AssessementInfo { get; set; } = new AssessmentInfoModel();
+        public AssessmentInfoModel AssessementInfo { get; set; } = new();
         [Required]
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public DateTime? StartTime { get; set; }

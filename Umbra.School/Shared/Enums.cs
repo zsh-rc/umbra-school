@@ -5,13 +5,13 @@ namespace Umbra.School.Shared
 {
     public enum AssessmentStatus
     {
-        [Description("Not Started")]
+        [Description("未开始")]
         NotStarted,
-        [Description("In Progress")]
+        [Description("正在进行测试")]
         InProgress,
-        [Description("Submitted")]
+        [Description("已提交审批")]
         Submitted,
-        [Description("Reviewed")]
+        [Description("审批完毕")]
         Reviewed
     }
 

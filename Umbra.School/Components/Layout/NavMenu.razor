@@ -24,7 +24,10 @@
     <AuthorizeView>
         <Authorized>
             <MudNavGroup Title="测试管理" Expanded="false" Icon="@Icons.Material.Filled.Book">
-                <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">英语词汇专项测试</MudNavLink>
+                <MudNavGroup Title="英语词汇专项测试" Expanded="false" Icon="@Icons.Material.Filled.Book">
+                    <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>
+                    <MudNavLink Href="/admin-assessment/english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试">审批测试</MudNavLink>
+                </MudNavGroup>
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>

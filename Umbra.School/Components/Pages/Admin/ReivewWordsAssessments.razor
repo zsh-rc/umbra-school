@@ -1,0 +1,170 @@
+﻿@page "/admin-assessment/english/words/review"
+@using Umbra.School.Models.Assessment
+@inject IAssessmentService AssessmentService
+@inject UserProvider UserProvider
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">审批测试</MudText>
+        <MudSpacer />
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudGrid Justify="Justify.FlexStart">
+    <MudItem xs="5">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.subtitle1">测试记录列表</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudDataGrid @ref="_dataGrid" T="AssessmentResultModel" Items="@_assessmentResults" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
+                             SelectedItemChanged="OnSelectedAssessmentItemChanged" MultiSelection="false" SelectOnRowClick="true" Groupable="true">
+                    <NoRecordsContent>
+                        <MudText Typo="Typo.caption">没有提交审批的测试。</MudText>
+                    </NoRecordsContent>
+                    <GroupTemplate>
+                        <MudText Typo="Typo.caption">@($"{context.Grouping.Key} ({context.Grouping.Count()})")</MudText>
+                    </GroupTemplate>
+                    <Columns>
+                        <SelectColumn ShowInHeader="false"></SelectColumn>
+                        <PropertyColumn Title="测试计划" Property="x => x.AssessementInfo.Name" Groupable="true" Grouping Hidden />
+                        <TemplateColumn Title="答题人员">
+                            <CellTemplate>
+                                <MudLink>@context.Item.ApplicationUser.UserName</MudLink>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn Title="状态" Property="x => x.Status" />
+                        <PropertyColumn Title="分数" Property="x => x.Score" />
+                    </Columns>
+                </MudDataGrid>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="7">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Filled.Reviews" Color="MudBlazor.Color.Primary" Class="mt-2" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.subtitle1">审批</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton StartIcon="@Icons.Material.Filled.CreditScore" Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="SubmitReviewResult"
+                               Disabled="@(_selectedAssessmentResult == null || _selectedAssessmentResult.Status != AssessmentStatus.Submitted.GetDescription())">提交审批结果</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudForm Model="_selectedAssessmentResult">
+                    <MudTextField Label="最终分数" AdornmentIcon="@Icons.Material.Filled.Score" Adornment="Adornment.Start" Immediate="true"
+                                  @bind-Value="_selectedAssessmentResult.Score" For="@(() => _selectedAssessmentResult.Score)"></MudTextField>
+                    <MudTextField Label="审批意见及反馈" Lines="2" Placeholder="请在此输入此次答题情况的反馈。"
+                                  @bind-Value="_selectedAssessmentResult.Feedback" For="@(() => _selectedAssessmentResult.Feedback)"
+                                  AdornmentIcon="@Icons.Material.Filled.RateReview" Adornment="Adornment.Start"></MudTextField>
+                </MudForm>
+                <MudField Variant="Variant.Outlined" Label="答题信息" Class="mt-6">
+                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+                                 ReadOnly="false" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(_selectedAssessmentResult==null?"d-none":"")">
+                        <NoRecordsContent>
+                            <MudText Typo="Typo.body1">请选择一条测试记录。</MudText>
+                        </NoRecordsContent>
+                        <Columns>
+                            <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
+                            <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
+                            <PropertyColumn Title="正确答案" Property="x => x.Word" Editable="true" />
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    @if (context.Item.Correct.HasValue && context.Item.Correct.Value)
+                                    {
+                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Check" Color="MudBlazor.Color.Success" OnClick="@(() => Rectify(context.Item))" 
+                                                       Disabled="@(_selectedAssessmentResult == null || _selectedAssessmentResult.Status != AssessmentStatus.Submitted.GetDescription())" />
+                                    }
+                                    else if (context.Item.Correct.HasValue && !context.Item.Correct.Value)
+                                    {
+                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Close" Color="MudBlazor.Color.Error" OnClick="@(() => Rectify(context.Item))" 
+                                                       Disabled="@(_selectedAssessmentResult == null || _selectedAssessmentResult.Status != AssessmentStatus.Submitted.GetDescription())" />
+                                    }
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudField>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+@code {
+    string _currentUsername = string.Empty;
+    MudDataGrid<AssessmentResultModel>? _dataGrid;
+    List<AssessmentResultModel> _assessmentResults = new List<AssessmentResultModel>();
+    AssessmentResultModel _selectedAssessmentResult = new();
+
+    MudDataGrid<WordsAssessmentDetailModel>? _reviewDataGrid;
+    List<WordsAssessmentDetailModel> _assessmentDetails = new List<WordsAssessmentDetailModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await GetCurrentUserId();
+        await LoadWordsAssessmentResults();
+        if (_selectedAssessmentResult != null)
+        {
+            await LoadWordsAssessmentDetails();
+        }
+    }
+
+    async Task GetCurrentUserId()
+    {
+        _currentUsername = (await UserProvider.GetUserAsync()).Username;
+    }
+
+    async Task LoadWordsAssessmentResults()
+    {
+        var result = await AssessmentService.GetAssessmentResults("EnglishWordsAssessment");
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessmentResults = result.Data;
+        }
+    }
+
+    private async Task OnSelectedAssessmentItemChanged(AssessmentResultModel item)
+    {
+        _selectedAssessmentResult = item == null ? new() : item;
+        if (item != null)
+        {
+            await LoadWordsAssessmentDetails();
+        }
+    }
+
+    async Task LoadWordsAssessmentDetails()
+    {
+        if (_selectedAssessmentResult == null) return;
+        var result = await AssessmentService.GetWordsAssessmentDetails(_selectedAssessmentResult.UserId, _selectedAssessmentResult.AssessmentInfoId);
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessmentDetails = result.Data;
+            var correct = _assessmentDetails.Count(x => x.Correct.HasValue && x.Correct.Value);
+            var total = _assessmentDetails.Count;
+            var score = total > 0 ? (int)Math.Round((double)correct / total * 100) : 0;
+            _selectedAssessmentResult.Score = score;
+        }
+    }
+
+    async Task Rectify(WordsAssessmentDetailModel item)
+    {
+        var result = await AssessmentService.RectifyAssessmentDetailRecord(item.Id, !item.Correct.GetValueOrDefault());
+        await LoadWordsAssessmentDetails();
+    }
+
+    async Task SubmitReviewResult()
+    {
+        _selectedAssessmentResult.ReviewedBy = _currentUsername;
+        _selectedAssessmentResult.Status = AssessmentStatus.Reviewed.GetDescription();
+        var result = await AssessmentService.SubmitReviewResult(_selectedAssessmentResult);
+        await LoadWordsAssessmentResults();
+        StateHasChanged();
+    }
+
+}

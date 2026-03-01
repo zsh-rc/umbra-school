@@ -11,6 +11,8 @@ namespace Umbra.School.Data.Assessment
         [Required]
         public string Name { get; set; } = string.Empty;
         [Required]
+        public string ShortSummary { get; set; } = string.Empty;
+        [Required]
         public string Category { get; set; } = string.Empty;
         [Required]
         public int ExpectDuration { get; set; }

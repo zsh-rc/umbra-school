@@ -8,10 +8,13 @@ namespace Umbra.School.Services
     {
         Task<ResponseModel<List<WordsAssessmentModel>>?> GetWordsAssessments();
         Task<ResponseModel<List<WordsAssessmentModel>>?> GetWordsAssessments(string userId);
-        Task<ResponseModel<Guid?>> AddWordsAssessment(WordsAssessmentModel model);
-        Task<ResponseModel<List<WordsAssessmentDetailModel>>> GetWordsAssessmentDetail(string userId, Guid wordAssessmentId);
+        Task<ResponseModel<bool>> AddWordsAssessment(WordsAssessmentModel model);
+        Task<ResponseModel<List<WordsAssessmentDetailModel>>> GetWordsAssessmentDetails(string userId, Guid assessmentInfoId);
         Task<ResponseModel<bool>> SubmitAssessmentAnswers(List<WordsAssessmentDetailModel> answers);
         Task<ResponseModel<bool>> StartAssessment(Guid assessmentInfoId, string userId);
         Task<ResponseModel<bool>> EndAssessment(Guid assessmentInfoId, string userId);
+        Task<ResponseModel<List<AssessmentResultModel>>> GetAssessmentResults(string category);
+        Task<ResponseModel<bool>> RectifyAssessmentDetailRecord(Guid id, bool correct);
+        Task<ResponseModel<bool>> SubmitReviewResult(AssessmentResultModel review);
     }
 }

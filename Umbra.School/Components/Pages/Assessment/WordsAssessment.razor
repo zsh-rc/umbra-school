@@ -12,12 +12,12 @@
     <MudToolBar Dense="true">
         <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇专项测试</MudText>
         <MudSpacer />
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+@*         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.Newspaper">提交测试</MudButton>
         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.LibraryBooks">错题本</MudButton>
         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.BarChart">测试分析</MudButton>
+                   StartIcon="@Icons.Material.Filled.BarChart">测试分析</MudButton> *@
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
@@ -107,11 +107,12 @@
         </MudStepper>
     </MudTabPanel>
     <MudTabPanel Text="历史记录">
-        <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" />
+        @* <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" /> *@
+        <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" />
     </MudTabPanel>
-    <MudTabPanel Text="测试详细信息">
+@*     <MudTabPanel Text="测试详细信息">
         <WordsAssessmentDetailComponent CurrentUserId="@_currentUserId" Assessment="@_selectedAssessment" />
-    </MudTabPanel>
+    </MudTabPanel> *@
 </MudTabs>
 
 @code {
@@ -119,9 +120,11 @@
     private MudTabs _tabs = new ();
 
     MudStepper _stepper = new();
+
     MudDataGrid<WordsAssessmentModel>? _dataGrid;
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
     WordsAssessmentModel? _selectedAssessment;
+
     List<WordsAssessmentDetailModel> _assessmentDetails = new List<WordsAssessmentDetailModel>();
     int _currentQuestionIndex = 0;
     int _totalQuestions = 0;
@@ -163,7 +166,7 @@
     async Task GetWordsAssessmentDetail()
     {
         if (_selectedAssessment == null) return;
-        var result = await AssessmentService.GetWordsAssessmentDetail(_currentUserId, _selectedAssessment.Id);
+        var result = await AssessmentService.GetWordsAssessmentDetails(_currentUserId, _selectedAssessment.AssessmentInfoId);
         if (result != null && result.Success && result.Data != null)
         {
             _assessmentDetails = result.Data;
@@ -333,11 +336,11 @@
         }
     }
 
-    private async Task HandleSelectedWordsAssessmentFromHistory(WordsAssessmentModel selectedAssessment)
-    {
-        _selectedAssessment = selectedAssessment;
-        await _tabs.ActivatePanelAsync(2);
-    }
+    // private async Task HandleSelectedWordsAssessmentFromHistory(WordsAssessmentModel selectedAssessment)
+    // {
+    //     _selectedAssessment = selectedAssessment;
+    //     await _tabs.ActivatePanelAsync(2);
+    // }
 
     
 }

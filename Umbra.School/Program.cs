@@ -32,8 +32,8 @@ builder.Services.AddAuthentication(options =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
-        .LogTo(Console.WriteLine, LogLevel.Information)
-        .EnableSensitiveDataLogging()
+        .LogTo(Console.WriteLine, LogLevel.Critical)
+        .EnableSensitiveDataLogging(false)
     ); 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 

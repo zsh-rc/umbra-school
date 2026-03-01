@@ -10,20 +10,14 @@
 
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
     <MudToolBar Dense="true">
-        <MudText Typo="Typo.h6" Style="font-weight:bold;">英语词汇专项测试管理</MudText>
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">制定测试计划</MudText>
         <MudSpacer />
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.Newspaper">提交测试</MudButton>
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.LibraryBooks">错题本</MudButton>
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.BarChart">测试分析</MudButton>
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
 <MudGrid Justify="Justify.FlexStart">
-    <MudItem xs="4">
+    <MudItem xs="5">
         <MudCard>
             <MudCardHeader Class="pb-0">
                 <CardHeaderContent>
@@ -31,12 +25,17 @@
                 </CardHeaderContent>
                 <CardHeaderActions>
                     <MudButton EndIcon="@Icons.Material.Filled.Add" Color="MudBlazor.Color.Primary" Variant="Variant.Filled" Disabled="@(!_planFormDisabled)" Size="MudBlazor.Size.Small" OnClick="NewPlan">新测试计划</MudButton>
-                    <MudButton EndIcon="@Icons.Material.Filled.Delete" Color="MudBlazor.Color.Secondary" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Disabled="@(!_planFormDisabled)">删除</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
             <MudCardContent Class="pt-0">
                 <MudForm Model="_model" Disabled="@_planFormDisabled">
-                    <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="测试计划名称" Class="mb-2" ReadOnly />
+                    <MudField Label="测试计划" Variant="Variant.Outlined">
+                        <MudStack Row>
+                            <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="名称" Class="mb-2" Required FullWidth />
+                            <MudSwitch T="bool" Label="重复多天" Color="MudBlazor.Color.Primary" ValueChanged="@(value => OnRepeatChange(value))" />
+                            <MudTextField T="int" @bind-Value="_model.RepeatTimes" For="@(() => _model.RepeatTimes)" FullWidth="false" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.EventRepeat" AdornmentColor="MudBlazor.Color.Success" Disabled="@(!_repeatable)" />
+                        </MudStack>
+                    </MudField>
                     <MudField Label="范围" Variant="Variant.Outlined">
                         <MudToggleGroup T="string" @bind-Value="_model.Scope" SelectionMode="SelectionMode.SingleSelection" Color="MudBlazor.Color.Secondary" CheckMark="true" FixedContent="true">
                             @{
@@ -51,29 +50,25 @@
                             <MudRadio Value="@("Unfamiliar")" Size="MudBlazor.Size.Small">生词（★&lt;=3）</MudRadio>
                             <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio>
                         </MudRadioGroup>
-                        <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users" Class="@($"ml-3{(_model.Source == "Library" ? " d-none" : "")}")"
-                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))"
-                                   Disabled="@(_model.Source == "Library")">
+                        <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users"
+                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))">
                             @foreach (var user in _allUsers)
                             {
                                 <MudSelectItem T="ApplicationUserModel" Value="@(user)">@user.UserName</MudSelectItem>
                             }
                         </MudSelect>
-
                     </MudField>
-                    <MudField Label="词汇数量" Variant="Variant.Outlined">
+                    <MudField Label="词汇数量（最大）" Variant="Variant.Outlined">
                         <MudRadioGroup T="Int32" @bind-Value="_model.WordCount" For="@(() => _model.WordCount)" Required="true">
                             <MudRadio Value="30" Size="MudBlazor.Size.Small">30</MudRadio>
                             <MudRadio Value="50" Size="MudBlazor.Size.Small">50</MudRadio>
                             <MudRadio Value="100" Size="MudBlazor.Size.Small">100</MudRadio>
-                            <MudRadio Value="150" Size="MudBlazor.Size.Small">150</MudRadio>
-                            <MudRadio Value="200" Size="MudBlazor.Size.Small">200</MudRadio>
                             <MudRadio Value="-1" Size="MudBlazor.Size.Small">All</MudRadio>
                         </MudRadioGroup>
                     </MudField>
                     <MudField Label="出题方式" Variant="Variant.Outlined">
                         <MudRadioGroup T="string" @bind-Value="_model.Method" For="@(() => _model.Method)" Required>
-                            <MudRadio Value="@("random")" Size="MudBlazor.Size.Small">随机</MudRadio>
+                            <MudRadio Value="@("random")" Size="MudBlazor.Size.Small" Disabled="@(_repeatable)">随机</MudRadio>
                             <MudRadio Value="@("order")" Size="MudBlazor.Size.Small">顺序</MudRadio>
                         </MudRadioGroup>
                         <MudNumericField T="Int32" @bind-Value="_model.StartIndex" For="@(() => _model.StartIndex)" Label="开始" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Disabled="@(_model.Method == "random")" />
@@ -96,6 +91,7 @@
             </NoRecordsContent>
             <Columns>
                 <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
+                <PropertyColumn Title="描述" Property="x => x.AssessmentInfo.ShortSummary" />
                 <PropertyColumn Title="针对用户" Property="x => x.AssessmentInfo.ForUserNames" />
                 <TemplateColumn Title="删除">
                     <CellTemplate>
@@ -108,7 +104,6 @@
 </MudGrid>
 
 @code {
-    // string currentUserId = string.Empty;
     List<ApplicationUserModel> _allUsers = new();
     IEnumerable<ApplicationUserModel> _users = new HashSet<ApplicationUserModel>();
 
@@ -116,6 +111,7 @@
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
 
     bool _planFormDisabled;
+    bool _repeatable;
 
     Dictionary<string, string> _scopes = new Dictionary<string, string>
     {
@@ -139,7 +135,6 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        // await GetCurrentUserId();
         await LoadWordsAssessments();
         InitializeForm();
     }
@@ -157,11 +152,6 @@
     {
         return $"已选择{selectedValues.Count}个用户。";
     }
-
-    // async Task GetCurrentUserId()
-    // {
-    //     currentUserId = (await UserProvider.GetUserAsync()).UserId;
-    // }
 
     async Task GetAllApplicationUsers()
     {
@@ -181,9 +171,20 @@
             Source = "Library",
             WordCount = 30,
             Method = "random",
-            StartIndex = -1,
-            ExpectDuration = 20
+            StartIndex = 1,
+            ExpectDuration = 20,
+            RepeatTimes = 2,
         };
+    }
+
+    void OnRepeatChange(bool val)
+    {
+        _repeatable = val;
+        if (_repeatable)
+        {
+            _model.Method = "order";
+            AppSnackbarService.ShowSuccess("将以顺序方式出题。");
+        }
     }
 
     async Task LoadWordsAssessments()
@@ -197,20 +198,29 @@
 
     async Task CreateWordsAssessment()
     {
-        var username = HttpContextAccessor?.HttpContext?.User?.Identity?.Name ?? "Unknown";
+        var username = (await UserProvider.GetUserAsync()).Username;
         if (string.IsNullOrEmpty(username)) return;
-        var name = $"{DateTime.Today.ToString("yyyymmdd")} - {_scopes[_model.Scope]} » {_sources[_model.Source]}（共{_model.WordCount}）» {_methods[_model.Method]}{(_model.Method == "order" ? $"（{_model.StartIndex}→）" : "")}";
-        _model.AssessmentInfoName = name;
-        _model.StartIndex = _model.Method == "random" ? -1 : _model.StartIndex;
-        string userIds = "*", usernames = "*";
-        if (_model.Source != "Library" && _users.Count() > 0)
+        if (string.IsNullOrEmpty(_model.AssessmentInfoName))
         {
-            userIds = string.Join(";", _users.Select(u => u.Id).ToList());
-            usernames = string.Join(";", _users.Select(u => u.UserName).ToList());
+            AppSnackbarService.ShowError("请提供一个测试计划名称。");
+            return;
         }
+        if (_users.Count() == 0)
+        {
+            AppSnackbarService.ShowError("请至少选择一个用户。");
+            return;
+        }
+        _model.AssessmentInfoName = _model.AssessmentInfoName;
+        _model.Repeatable = _repeatable;
+        var summary = $"{_scopes[_model.Scope]} » {_sources[_model.Source]}（{_model.WordCount}以内，{_methods[_model.Method]}{(_model.Method == "order" ? $"，从{_model.StartIndex}开始" : "")}）";
+        _model.ShortSummary = summary;
+        _model.StartIndex = _model.Method == "random" ? -1 : _model.StartIndex;
+        string userIds = string.Join(";", _users.Select(u => u.Id).ToList());
+        string usernames = string.Join(";", _users.Select(u => u.UserName).ToList());        
         _model.AssessmentInfo = new AssessmentInfoModel
         {
-            Name = name,
+            Name = _model.AssessmentInfoName,
+            ShortSummary = summary,
             Category = "EnglishWordsAssessment",
             CreateDate = DateTime.Now,
             CreatedBy = username,
@@ -225,6 +235,7 @@
             _planFormDisabled = true;
             StateHasChanged();
             AppSnackbarService.ShowSuccess("测试已生成，可以选择下一步操作。");
+            await LoadWordsAssessments();
         }
         else
         {
