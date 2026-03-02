@@ -92,7 +92,7 @@ namespace Umbra.School.Services
                     {
                         var wordList = _context.UserEnglishWordRatings
                             .Include(r => r.EnglishWord)
-                            .Where(r => r.UserId == userId && r.Rating <= 3)
+                            .Where(r => r.UserId == userId && r.Rating >=1 && r.Rating <= 3)
                             .OrderBy(r => r.EnglishWord.Word)
                             .Skip(model.StartIndex - 1)
                             .Select(r => r.EnglishWord)
@@ -233,7 +233,7 @@ namespace Umbra.School.Services
                         {
                             var query = _context.UserEnglishWordRatings
                                 .Include(r => r.EnglishWord) // Eager load the Word details
-                                .Where(r => r.UserId == forUserId && r.Rating <= 3)
+                                .Where(r => r.UserId == forUserId && r.Rating >= 1 && r.Rating <= 3)
                                 .Select(r => r.EnglishWord);
 
                             if (model.Method == "random")

@@ -1,10 +1,10 @@
-﻿@page "/english/words"
-@page "/english/words/{book}"
-@page "/english/words/{book}/{alphabet}"
+﻿@page "/english/words/{book}/{alphabet}"
+@page "/english/words/{book}/{start:int}/{end:int}"
 @attribute [Authorize]
 @using Umbra.School.Models
 @using Umbra.School.Models.English
 @inject IEnglishService EnglishService
+@inject NavigationManager NavigationManager
 
 <style>
     .mud-toolbar {
@@ -14,44 +14,48 @@
 
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
     <MudToolBar Dense="true">
-        <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇（共@(_totalItems) / @(_totalWordsOfBook)个）</MudText>
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">@(Dictionaries.WordsAssessmentScopes[book])（共@(_totalItems) / @(_totalWordsOfBook)个）</MudText>
         <MudSpacer />
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.Newspaper">水平测试</MudButton>
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.LibraryBooks">生词本/备忘薄</MudButton>
-        <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
-                   StartIcon="@Icons.Material.Filled.BarChart">统计分析</MudButton>
+        <MudForm>
+            <MudStack Style="width: 300px;" Row>
+                <MudTextField @bind-Value="@start" Style="width: 80px;" Mask="@(new RegexMask(@"^[0-9]\d*$"))" Label="从"></MudTextField>
+                <MudTextField @bind-Value="@end" Style="width: 80px;" Mask="@(new RegexMask(@"^[0-9]\d*$"))" Label="到"></MudTextField>
+                <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="FilterByIndex" ButtonType="ButtonType.Button"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Abc" OnClick="FilterByAbc" ButtonType="ButtonType.Button"></MudIconButton>
+            </MudStack>
+        </MudForm>
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
-<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_displayItems" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none">
+<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_displayItems" Dense="true" Virtualize="false" ReadOnly="true">
     <ToolBarContent>
         <MudToolBar Dense="true">
             @{
-                var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
-                foreach (var letter in alphabets)
+                if (!string.IsNullOrEmpty(alphabet))
                 {
-                    <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{book}/{letter.ToString().ToLower()}")"
-                             Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                    var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+                    foreach (var letter in alphabets)
+                    {
+                        <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{book}/{letter.ToString().ToLower()}")"
+                                 Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                    }
                 }
             }
-
-            <MudRating Size="@MudBlazor.Size.Medium" EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success" SelectedValueChanged="@(val => FilterByRating(val))" />
+            <MudSpacer />
         </MudToolBar>
     </ToolBarContent>
     <NoRecordsContent>
         <MudText Typo="Typo.body1">没有任何记录。</MudText>
     </NoRecordsContent>
     <Columns>
-        <TemplateColumn CellClass="d-flex justify-end" Title="英文单词">
+        <TemplateColumn CellClass="d-flex justify-end" Title="英文单词" HeaderClass="d-flex justify-end" Sortable="true" SortBy="X => X.Word">
             <CellTemplate>
                 <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>&nbsp;
                 <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>&nbsp;
             </CellTemplate>
         </TemplateColumn>
-        <TemplateColumn Title="生疏->熟练">
+        <TemplateColumn Title="熟练程度" Sortable="true" SortBy="X => X.Rating">
             <CellTemplate>
                 <MudStack Row>
                     <MudRating Size="@MudBlazor.Size.Small"
@@ -63,7 +67,7 @@
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Property="x => x.Meaning" Title="中文释义" Editable="false"></PropertyColumn>
+        <PropertyColumn Property="x => x.Meaning" Title="中文释义" Sortable="true"></PropertyColumn>
     </Columns>
 </MudDataGrid>
 
@@ -80,6 +84,10 @@
     public string? book { get; set; }
     [Parameter]
     public string? alphabet { get; set; }
+    [Parameter]
+    public int? start { get; set; }
+    [Parameter]
+    public int? end { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authStateTask { get; set; }
     private string? username;
@@ -110,7 +118,7 @@
     async Task LoadData()
     {
         if (string.IsNullOrEmpty(username)) return;
-        var result = await EnglishService.GetEnglishWordsWithRating(username, book, alphabet);
+        var result = await EnglishService.GetEnglishWordsWithRatings(username, book, alphabet, start, end);
         if (result == null) return;
         if (result.Success)
         {
@@ -128,8 +136,16 @@
         StateHasChanged();
     }
 
-    void FilterByRating(int val)
+    void FilterByIndex()
     {
-        _displayItems = _allItems.Where(i => i.Rating == val).OrderBy(i => i.Word).ToList();
+        if (start == null || start <= 0) start = 1;
+        if (end == null || end <= 0) end = 0;
+        NavigationManager.NavigateTo($"/english/words/{book}/{start}/{end}");
     }
+
+    void FilterByAbc()
+    {
+        NavigationManager.NavigateTo($"/english/words/{book}/a");
+    }
+
 }

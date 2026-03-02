@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +82,7 @@ namespace Umbra.School.Services
             return Task.FromResult(result);
         }
 
-        public async Task<ResponseModel<WordListModel>> GetEnglishWordsWithRating(string username, string? book, string? alphabet)
+        public async Task<ResponseModel<WordListModel>> GetEnglishWordsWithRatings(string username, string? book, string? alphabet, int? start, int? end)
         {
             var userId = _context.Users.First(u => u.NormalizedUserName == username.ToUpper()).Id;
             // 1. Prepare base query with NoTracking for speed
@@ -102,7 +103,15 @@ namespace Umbra.School.Services
                 baseQuery = baseQuery.Where(w => w.Word.StartsWith(alphabet));
             }
 
-            // 5. Project directly to the model (AutoMapper handles the LEFT JOIN to UserRatings)
+            if (start != null || end != null)
+            {
+                var startIndex = (start == null ? 1 : start.Value);
+                var endIndex = (end == null ? totalWordsOfBook : end.Value);
+                var count = endIndex - startIndex + 1;
+                baseQuery = baseQuery.OrderBy(e => e.Word).Skip(startIndex - 1).Take(count);
+            }
+
+            // Project directly to the model (AutoMapper handles the LEFT JOIN to UserRatings)
             // Pass userId as a parameter for the Mapping Profile
             var list = await baseQuery
                 .ProjectTo<EnglishWordModel>(_mapper.ConfigurationProvider, new { userId })
@@ -122,6 +131,32 @@ namespace Umbra.School.Services
             };
         }
 
+        public async Task<ResponseModel<WordListModel>> GetUnfamiliarEnglishWords(string userId)
+        {
+            var baseQuery = _context.EnglishWords.AsNoTracking();
+
+            // Project directly to the model (AutoMapper handles the LEFT JOIN to UserRatings)
+            // Pass userId as a parameter for the Mapping Profile
+            var list = await baseQuery
+                .ProjectTo<EnglishWordModel>(_mapper.ConfigurationProvider, new { userId })
+                .Where(e => e.Rating >=1 && e.Rating <= 3)
+                .OrderBy(e => e.Word)
+                .ToListAsync();
+
+            var totalWordsOfBook = list.Count();
+
+            return new ResponseModel<WordListModel>
+            {
+                Success = true,
+                Data = new WordListModel
+                {
+                    TotalWordsOfBook = totalWordsOfBook,
+                    EnglishWords = list
+                },
+                Code = "DATA-LOADED",
+                Message = "Data loaded successfully."
+            };
+        }
 
         public async Task<ResponseModel<bool>> RatingEnglishWord(string username, Guid wordId, int rating)
         {

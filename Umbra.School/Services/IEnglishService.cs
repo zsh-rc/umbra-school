@@ -7,7 +7,8 @@ namespace Umbra.School.Services
     {
         Task<ResponseModel<List<EnglishWordModel>>?> GetEnglishWords();
         Task<ResponseModel<WordListModel>> GetEnglishWords(string? book, string? alphabet);
-        Task<ResponseModel<WordListModel>> GetEnglishWordsWithRating(string username, string? book, string? alphabet);
+        Task<ResponseModel<WordListModel>> GetEnglishWordsWithRatings(string username, string? book, string? alphabet, int? start, int? end);
+        Task<ResponseModel<WordListModel>> GetUnfamiliarEnglishWords(string userId);
         Task<ResponseModel<EnglishWordModel>?> GetEnglishWordById(int id);
         Task<ResponseModel<Guid>?> AddEnglishWord(EnglishWordModel word);
         Task<ResponseModel<bool>?> UpdateEnglishWord(EnglishWordModel word);

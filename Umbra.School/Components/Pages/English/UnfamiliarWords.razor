@@ -1,0 +1,74 @@
+﻿@page "/english/words/unfamiliar"
+@attribute [Authorize]
+@using Umbra.School.Models.English
+@inject UserProvider UserProvider
+@inject IEnglishService EnglishService
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">我的生词库（共@(_totalItems)个）</MudText>
+        <MudSpacer />
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true">
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">没有任何记录。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <TemplateColumn CellClass="d-flex justify-end" Title="英文单词" HeaderClass="d-flex justify-end" Sortable="true" SortBy="X => X.Word">
+            <CellTemplate>
+                <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>&nbsp;
+                <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>&nbsp;
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="熟练程度" Sortable="true" SortBy="X => X.Rating">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudRating Size="@MudBlazor.Size.Small"
+                               EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
+                               SelectedValue="@context.Item.Rating" SelectedValueChanged="@(val => Rating(context.Item, val))" />
+                    @* <MudButton Size="@MudBlazor.Size.Small" Variant="@Variant.Filled"
+                                   Color="@MudBlazor.Color.Default" StartIcon="@Icons.Material.Filled.Add"
+                                   Style="white-space: nowrap">备忘</MudButton> *@
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="x => x.Meaning" Title="中文释义" Sortable="true"></PropertyColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    MudDataGrid<EnglishWordModel> _dataGrid = new MudDataGrid<EnglishWordModel>();
+    List<EnglishWordModel> _allItems { get; set; } = new();
+    int _totalItems;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        var _currentUserId = (await UserProvider.GetUserAsync()).UserId;
+        if (string.IsNullOrEmpty(_currentUserId)) return;
+        var result = await EnglishService.GetUnfamiliarEnglishWords(_currentUserId);
+        if (result == null) return;
+        if (result.Success)
+        {
+            _allItems = result.Data?.EnglishWords ?? new List<EnglishWordModel>();
+            _totalItems = _allItems.Count;
+        }
+    }
+
+    async Task Rating(EnglishWordModel word, int val)
+    {
+        var _currentUsername = (await UserProvider.GetUserAsync()).Username;
+        if (string.IsNullOrEmpty(_currentUsername)) return;
+        var result = await EnglishService.RatingEnglishWord(_currentUsername, word.Id, val);
+        StateHasChanged();
+    }
+
+}

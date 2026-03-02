@@ -1,4 +1,5 @@
 ﻿@page "/admin-assessment/english/words/review"
+@attribute [Authorize(Roles = "Administrators")]
 @using Umbra.School.Models.Assessment
 @inject IAssessmentService AssessmentService
 @inject UserProvider UserProvider

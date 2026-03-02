@@ -1,5 +1,5 @@
 ﻿@page "/admin-assessment/english/words"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "Administrators")]
 @using Umbra.School.Models.Assessment
 @using Umbra.School.Models.Account
 @inject IAccountService AccountService
@@ -91,7 +91,6 @@
             </NoRecordsContent>
             <Columns>
                 <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
-                <PropertyColumn Title="描述" Property="x => x.AssessmentInfo.ShortSummary" />
                 <PropertyColumn Title="针对用户" Property="x => x.AssessmentInfo.ForUserNames" />
                 <TemplateColumn Title="删除">
                     <CellTemplate>
