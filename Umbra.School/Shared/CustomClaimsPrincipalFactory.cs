@@ -24,8 +24,8 @@ namespace Umbra.School.Shared
             identity.AddClaims(new[] {
                 new Claim("EmailAddress", user.Email ?? ""),
                 new Claim("CustomUserId", user.Id),
-                new Claim("FirstName", user.FirstName!),
-                new Claim("LastName", user.LastName!),
+                new Claim("FirstName", !string.IsNullOrEmpty(user.FirstName)?user.FirstName : ""),
+                new Claim("LastName", !string.IsNullOrEmpty(user.LastName)?user.LastName : ""),
             });
 
             return principal;
