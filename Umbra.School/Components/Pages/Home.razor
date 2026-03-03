@@ -1,40 +1,228 @@
 ﻿@page "/"
+@using Umbra.School.Models.Assessment
+@using Umbra.School.Models.Dashboard
 @attribute [Authorize]
+@inject IDashboardService DashboardService
+@inject UserProvider UserProvider;
 
 <PageTitle>Home</PageTitle>
 
 <MudContainer Class="mt-8 px-8 mud-full-height" MaxWidth="MaxWidth.False">
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+            <MudPaper Elevation="2" Class="pa-4">
+                <ApexChart TItem="EnglishWordsCountModel"
+                           Title="词汇库" Options="_englishWordsCountSeriesBarChartOptions">
+                    <ApexPointSeries TItem="EnglishWordsCountModel"
+                                     Items="_englishWordsCount"
+                                     Name="词汇数量"
+                                     XValue="@(e => Dictionaries.WordsAssessmentScopes[e.Book])"
+                                     YAggregate="@(e => e.Sum(e => e.WordsCount))"
+                                     OrderByDescending="e=>e.Y"
+                                     SeriesType="SeriesType.Bar"
+                                     PointColor="e=> HighlightUnfamiliarColor(e)"
+                                     ShowDataLabels="true" />
+                </ApexChart>
+            </MudPaper>
         </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
+        <MudItem xs="12" sm="6" md="8">
+            <MudPaper Elevation="2" Class="pa-4">
+                <ApexChart TItem="EnglishWordsAssessmentResultModel"
+                           Title="我的测试统计"
+                           Options="_assessmentMixedChartOptions">
+
+                    <ApexPointSeries TItem="EnglishWordsAssessmentResultModel"
+                                     Items="_myAssessmentResults"
+                                     Name="词汇数量"
+                                     SeriesType="SeriesType.Bar"
+                                     XValue="@(e => e.AssessmentInfoName)"
+                                     YValue="@(e => (decimal)e.WordsCount)"
+                                     ShowDataLabels="false" />
+
+                    <ApexPointSeries TItem="EnglishWordsAssessmentResultModel"
+                                     Items="_myAssessmentResults"
+                                     Name="分数"
+                                     SeriesType="SeriesType.Line"
+                                     XValue="@(e => e.AssessmentInfoName)"
+                                     YValue="@(e => e.Score ?? 0)" 
+                                     ShowDataLabels="true" />
+                </ApexChart>
+            </MudPaper>
         </MudItem>
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6">
-            <MudGrid>
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                </MudItem>
-                <MudItem xs="12">
-                    <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-                </MudItem>
-            </MudGrid>
-        </MudItem>
-@*         <MudItem xs="12" sm="6">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 100%"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem>
-        <MudItem xs="12" sm="12" md="4">
-            <MudPaper Elevation="2" Class="pa-4" Style="height: 200px;"></MudPaper>
-        </MudItem> *@
     </MudGrid>
 </MudContainer>
+
+@code {
+    string _currentUserId = string.Empty;
+    List<EnglishWordsCountModel> _englishWordsCount = new List<EnglishWordsCountModel>();
+    List<ChartSeries<int>> _englishWordsCountSeries = new();
+    ApexChartOptions<EnglishWordsCountModel> _englishWordsCountSeriesBarChartOptions = new()
+    {
+        Yaxis = new List<YAxis> { new YAxis { Show = false } },
+        Grid = new Grid
+        {
+            Xaxis = new GridXAxis { Lines = new Lines { Show = false } },
+            Yaxis = new GridYAxis { Lines = new Lines { Show = false } }
+        },
+        DataLabels = new DataLabels
+        {
+            Enabled = true,
+            Style = new DataLabelsStyle
+            {
+                FontSize = "20px",
+                Colors = new List<string> { "#333" }
+            },
+            Background = new DataLabelsBackground
+            {
+                Enabled = true,
+                ForeColor = "#fff",
+                Padding = 4,
+                BorderRadius = 2,
+                BorderWidth = 1,
+                BorderColor = "#fff",
+                Opacity = 0.9
+            }
+        },
+        Chart = new Chart { Height = 300 },
+    };
+    private string? HighlightUnfamiliarColor(EnglishWordsCountModel model)
+    {
+        if (model.Book == "myu") { return "#FF5734"; }
+        return null;
+    }
+
+    List<EnglishWordsAssessmentResultModel> _myAssessmentResults = new List<EnglishWordsAssessmentResultModel>();
+    ApexChartOptions<EnglishWordsAssessmentResultModel> _assessmentMixedChartOptions = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        _currentUserId = (await UserProvider.GetUserAsync()).UserId;
+        await LoadEnglishWordsCount();
+        await LoadAssessmentResultsData();
+        DefineAssessmentResultChartOptions();
+    }
+
+    async Task LoadEnglishWordsCount()
+    {
+        var result = await DashboardService.GetEnglishWordsCount(_currentUserId);
+        if (result.Data != null && result.Success)
+        {
+            _englishWordsCount = result.Data;
+            _englishWordsCount.ForEach(x =>
+            {
+                _englishWordsCountSeries.Add(new ChartSeries<int>
+                {
+                    Name = Dictionaries.WordsAssessmentScopes[x.Book],
+                    Data = new List<int> { x.WordsCount }
+                });
+            });
+        }
+    }
+
+    void DefineAssessmentResultChartOptions()
+    {
+        // 1. Sort data by Date (Crucial for grouping to work)
+        _myAssessmentResults = _myAssessmentResults
+            .OrderBy(x => x.Date)
+            .ThenBy(x => x.AssessmentInfoName)
+            .ToList();
+
+        // 2. Generate the Group headers (The Date line at the bottom)
+        var dateGroups = _myAssessmentResults
+            .GroupBy(x => x.Date.ToString("M/d"))
+            .Select(g => new XAxisGroup
+            {
+                Title = g.Key,
+                Cols = g.Count() // Tells Apex how many bars belong under this date
+            })
+            .ToList();
+
+        // 3. Configure the Chart Options
+        _assessmentMixedChartOptions = new ApexChartOptions<EnglishWordsAssessmentResultModel>
+        {
+            Xaxis = new XAxis
+            {
+                Type = XAxisType.Category,
+                TickPlacement = TickPlacement.Between,
+                Group = new XAxisGroups
+                {
+                    Groups = dateGroups,
+                    Style = new XAxisGroupStyle { FontSize = "12px", FontWeight = "700", Colors = new List<string> { "#555" } }
+                },
+                Labels = new XAxisLabels
+                {
+                    // Show = true,
+                    Formatter = "function(val) { return ''; }",
+                    // Rotate = -45, // Rotates AssessmentNames if they are long
+                    // Style = new AxisLabelStyle { FontSize = "10px" }
+                    MinHeight = 20
+                },
+            },
+            Yaxis = new List<YAxis>
+            {
+                new YAxis // First Y-Axis (Left)
+                {
+                    Title = new AxisTitle { Text = "词汇数量" },
+                    Min = 0,
+                    ForceNiceScale = true
+                },
+                new YAxis // Second Y-Axis (Right)
+                {
+                    Opposite = true,
+                    Title = new AxisTitle { Text = "分数" },
+                    Min = 0,
+                    Max = 110,
+                    TickAmount = 10
+                }
+            },
+            DataLabels = new DataLabels
+            {
+                Enabled = true, // Shows labels for both Bar and Line
+                Formatter = "function(val) { return val; }",
+                EnabledOnSeries = new List<double> { 0, 1 },
+                OffsetY = -5,  // Slightly offsets labels above the points/bars
+                Style = new DataLabelsStyle
+                {
+                    FontSize = "12px",
+                    Colors = new List<string> { "#333" }
+                },
+                Background = new DataLabelsBackground
+                {
+                    Enabled = true,
+                    ForeColor = "#fff",
+                    Padding = 4,
+                    BorderRadius = 2,
+                    BorderWidth = 1,
+                    BorderColor = "#fff",
+                    Opacity = 0.9
+                }
+            },
+            PlotOptions = new PlotOptions
+            {
+                Bar = new PlotOptionsBar
+                {
+                    DataLabels = new PlotOptionsBarDataLabels
+                    {
+                        Position = BarDataLabelPosition.Center
+                    }
+                }
+            },
+            Grid = new Grid()
+            {
+                Padding = new Padding { Bottom = 0 }
+            },
+            Chart = new Chart { Height = 300 },
+        };
+    }
+
+    async Task LoadAssessmentResultsData()
+    {
+        var result = await DashboardService.GetAssessmentResults(_currentUserId);
+        if (result.Data != null && result.Success)
+        {
+            _myAssessmentResults = result.Data;
+        }
+    }
+
+}

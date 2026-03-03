@@ -5,7 +5,8 @@
         public static Dictionary<string, string> WordsAssessmentScopes = new Dictionary<string, string>
         {
             { "shsv", "上海高中词汇" },
-            { "shpsv", "上海小学词汇" }
+            { "shpsv", "上海小学词汇" },
+            { "myu", "我的生词库" },
         };
         public static Dictionary<string, string> WordsAssessmentSources = new Dictionary<string, string>
         {

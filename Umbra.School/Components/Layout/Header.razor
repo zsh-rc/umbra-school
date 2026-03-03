@@ -13,9 +13,9 @@
             Umbra
         </MudElement>
         <MudElement HtmlTag="span"
-            Style="color:#FFFFFF;font-weight:bold;"
-            href="/"
-            target="blank"rel="noopener noreferrer">
+                    Style="color:#FFFFFF;font-weight:bold;"
+                    href="/"
+                    target="blank" rel="noopener noreferrer">
             School
         </MudElement>
     </MudText>
@@ -29,7 +29,7 @@
     <AuthorizeView>
         <Authorized>
             <MudMenu>
-                <ActivatorContent>
+                <ActivatorContent Context="acContext">
                     <MudAvatar Color="MudBlazor.Color.Primary">
                         @((context.User.Identity?.Name)?.Substring(0, 1)?.ToUpper())
                     </MudAvatar>
@@ -55,7 +55,7 @@
         <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
                        OnClick="LayoutStateService.ToggleTheme" />
         <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="MudBlazor.Color.Inherit" />
-    }          
+    }
 </MudToolBar>
 
 @code {

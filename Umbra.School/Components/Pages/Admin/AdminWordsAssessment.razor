@@ -104,7 +104,7 @@
 
 @code {
     List<ApplicationUserModel> _allUsers = new();
-    IEnumerable<ApplicationUserModel> _users = new HashSet<ApplicationUserModel>();
+    IReadOnlyCollection<ApplicationUserModel> _users = new HashSet<ApplicationUserModel>();
 
     MudDataGrid<WordsAssessmentModel>? _dataGrid;
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();

@@ -62,6 +62,8 @@ builder.Services.AddScoped<IAssessmentService, AssessmentService>();
 builder.Services.AddScoped<AppSnackbarService>();
 // Zach 18-Feb-26: Account service for user management
 builder.Services.AddScoped<IAccountService, AccountService>();
+// Zach 3-Mar-26: Dashboard service for dashboard data retrieval
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Zach 18-Feb-26
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();

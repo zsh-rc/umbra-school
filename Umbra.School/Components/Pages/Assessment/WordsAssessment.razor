@@ -68,9 +68,9 @@
                     <MudField Label="答题区" ShrinkLabel="false" Variant="Variant.Outlined" Class="justify-center" Underline="false">
                         <MudForm Class="px-20 py-8">
                             <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
-                                          AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" AutoGrow ReadOnly /><br /><br />
+                                          AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" ReadOnly /><br /><br />
                             <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "new-password" } })"
-                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true" TextUpdateSuppression="false"
+                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true"
                                           AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
                             <MudPaper Class="pa-4 mt-4" Elevation="0">
                                 <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
@@ -279,7 +279,7 @@
             case 0:
                 if (_selectedAssessment == null)
                 {
-                    await DialogService.ShowMessageBox("信息", "请首先选择一个测试计划。");
+                    await DialogService.ShowMessageBoxAsync("信息", "请首先选择一个测试计划。");
                     arg.Cancel = true;
                 }
                 else
@@ -291,24 +291,24 @@
             case 1:
                 if (!_step2Complete)
                 {
-                    await DialogService.ShowMessageBox("信息", "尚未确认答题完毕。");
+                    await DialogService.ShowMessageBoxAsync("信息", "尚未确认答题完毕。");
                     arg.Cancel = true;
                 }
                 break;
             case 2:
                 if (_assessmentDetails.Count() == 0)
                 {
-                    await DialogService.ShowMessageBox("信息", "没有要提交的记录。");
+                    await DialogService.ShowMessageBoxAsync("信息", "没有要提交的记录。");
                     arg.Cancel = true;
                 }
                 var result = await AssessmentService.SubmitAssessmentAnswers(_assessmentDetails);
                 if (result.Success && result.Data)
                 {
-                    await DialogService.ShowMessageBox("信息", "已完成提交。");
+                    await DialogService.ShowMessageBoxAsync("信息", "已完成提交。");
                 }
                 else
                 {
-                    await DialogService.ShowMessageBox("错误", "未知错误导致结果未提交。");
+                    await DialogService.ShowMessageBoxAsync("错误", "未知错误导致结果未提交。");
                 }
                 _step3Complete = true;
                 break;
@@ -322,14 +322,14 @@
             case 0:
                 if (_selectedAssessment == null)
                 {
-                    await DialogService.ShowMessageBox("信息", "请首先选择一个测试计划。");
+                    await DialogService.ShowMessageBoxAsync("信息", "请首先选择一个测试计划。");
                     arg.Cancel = true;
                 }
                 break;
             case 1:
                 // if (_step1Complete != true || (_step2TextInput?.Length ?? 0) == 0)
                 // {
-                //     await DialogService.ShowMessageBox("Error", "Finish step 1 and 2 first");
+                //     await DialogService.ShowMessageBoxAsync("Error", "Finish step 1 and 2 first");
                 //     arg.Cancel = true;
                 // }
                 break;
