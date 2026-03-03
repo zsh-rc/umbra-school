@@ -6,14 +6,14 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">主页</MudNavLink>
     <AuthorizeView>
         <Authorized>
-            <MudNavGroup Title="英语课程" Expanded="false" Icon="@Icons.Material.Filled.Book">
+            <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english")" Icon="@Icons.Material.Filled.Book">
                 <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
                 <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="小学词汇">小学词汇</MudNavLink>
                 <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" Class="d-none">高中词组</MudNavLink>
                 <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译" Class="d-none">语句翻译</MudNavLink>
                 <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读" Class="d-none">时文阅读</MudNavLink>
                 <MudNavLink Href="/english/words/unfamiliar" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="我的生词库">我的生词库</MudNavLink>
-                <MudNavGroup Title="水平测试" Expanded="false" Icon="@Icons.Material.Filled.Assessment">
+                <MudNavGroup Title="水平测试" Expanded="@IsExpanded("/assessment")" Icon="@Icons.Material.Filled.Assessment">
                     <MudNavLink Href="/assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="词汇专项测试">词汇专项测试</MudNavLink>
                     <MudNavLink Href="/assessment/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试" Class="d-none">词组专项测试</MudNavLink>
                     <MudNavLink Href="/assessment/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="翻译专项测试" Class="d-none">翻译专项测试</MudNavLink>
@@ -25,7 +25,7 @@
     </AuthorizeView>
     <AuthorizeView Roles="Administrators">
         <Authorized>
-            <MudNavGroup Title="测试管理" Expanded="false" Icon="@Icons.Material.Filled.Book">
+            <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment")" Icon="@Icons.Material.Filled.Book">
                 <MudNavGroup Title="英语词汇专项测试" Expanded="false" Icon="@Icons.Material.Filled.Book">
                     <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>
                     <MudNavLink Href="/admin-assessment/english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试">审批测试</MudNavLink>
@@ -69,6 +69,12 @@
     {
         currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
+    }
+
+    private bool IsExpanded(string hrefSegment)
+    {
+        // Checks if the current URL contains the path segment
+        return NavigationManager.Uri.Contains(hrefSegment, StringComparison.OrdinalIgnoreCase);
     }
 
     public void Dispose()

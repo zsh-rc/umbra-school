@@ -1,6 +1,7 @@
 ﻿@implements IDisposable
 @inject LayoutStateService LayoutStateService
 @inject NavigationManager NavigationManager
+@inject UserProvider UserProvider
 
 <MudToolBar Class="pa-0 mb-0" Style="width:100%;">
     <MudText Typo="Typo.h5">
@@ -31,7 +32,7 @@
             <MudMenu>
                 <ActivatorContent Context="acContext">
                     <MudAvatar Color="MudBlazor.Color.Primary">
-                        @((context.User.Identity?.Name)?.Substring(0, 1)?.ToUpper())
+                        @(_currentDisplayAvatar)
                     </MudAvatar>
                 </ActivatorContent>
                 <ChildContent>
@@ -59,11 +60,38 @@
 </MudToolBar>
 
 @code {
+    string _currentDisplayName = string.Empty;
+    string _currentDisplayAvatar = string.Empty;
     private string? currentUrl;
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+        await GetCurrentUserNames();
+    }
+
+    async Task GetCurrentUserNames()
+    {
+        var user = await UserProvider.GetUserAsync();
+        var username = user.Username;
+        var firstName = user.FirstName;
+        var lastName = user.LastName;
+        if (string.IsNullOrWhiteSpace(firstName) && string.IsNullOrWhiteSpace(lastName))
+        {
+            _currentDisplayName = username;
+            if (!string.IsNullOrEmpty(_currentDisplayName))
+            {
+                _currentDisplayAvatar = username.Substring(0, 1).ToUpper();
+            }
+        }
+        else
+        {
+            _currentDisplayName = user.FullName;
+            if (!string.IsNullOrEmpty(_currentDisplayName))
+            {
+                _currentDisplayAvatar = _currentDisplayName.Substring(_currentDisplayName.Length - 1, 1).ToUpper();
+            }
+        }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

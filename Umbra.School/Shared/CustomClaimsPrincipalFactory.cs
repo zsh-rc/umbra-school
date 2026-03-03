@@ -22,9 +22,11 @@ namespace Umbra.School.Shared
 
             // Add custom claims for your session values
             identity.AddClaims(new[] {
-            new Claim("EmailAddress", user.Email ?? ""),
-            new Claim("CustomUserId", user.Id)
-        });
+                new Claim("EmailAddress", user.Email ?? ""),
+                new Claim("CustomUserId", user.Id),
+                new Claim("FirstName", user.FirstName!),
+                new Claim("LastName", user.LastName!),
+            });
 
             return principal;
         }

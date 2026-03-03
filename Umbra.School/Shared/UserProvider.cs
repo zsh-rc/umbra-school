@@ -25,7 +25,9 @@ namespace Umbra.School.Shared
                 UserId = user.FindFirst("CustomUserId")?.Value ?? "",
                 Username = user.Identity.Name ?? "",
                 Email = user.FindFirst("EmailAddress")?.Value ?? "",
-                IsAdmin = user.IsInRole("Admin")
+                IsAdmin = user.IsInRole("Admin"),
+                FirstName = user.FindFirst("FirstName")?.Value ?? "",
+                LastName = user.FindFirst("LastName")?.Value ?? "",
             };
         }
     }

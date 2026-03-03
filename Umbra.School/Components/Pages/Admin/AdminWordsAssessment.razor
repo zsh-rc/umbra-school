@@ -37,7 +37,8 @@
                         </MudStack>
                     </MudField>
                     <MudField Label="范围" Variant="Variant.Outlined">
-                        <MudToggleGroup T="string" @bind-Value="_model.Scope" SelectionMode="SelectionMode.SingleSelection" Color="MudBlazor.Color.Secondary" CheckMark="true" FixedContent="true">
+                        <MudToggleGroup T="string" @bind-Value="_model.Scope" SelectionMode="SelectionMode.SingleSelection" Color="MudBlazor.Color.Secondary"
+                                        CheckMark="true" FixedContent="true">
                             @{
                                 foreach (var scope in _scopes)
                                 {
@@ -51,7 +52,7 @@
                             <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio>
                         </MudRadioGroup>
                         <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users"
-                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<List<string>, string>(GetMultiSelectionText))">
+                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<IReadOnlyList<string>, string>(GetMultiSelectionText))">
                             @foreach (var user in _allUsers)
                             {
                                 <MudSelectItem T="ApplicationUserModel" Value="@(user)">@user.UserName</MudSelectItem>
@@ -147,7 +148,7 @@
         }
     }
 
-    private string GetMultiSelectionText(List<string> selectedValues)
+    private string GetMultiSelectionText(IReadOnlyList<string> selectedValues)
     {
         return $"已选择{selectedValues.Count}个用户。";
     }
@@ -215,7 +216,7 @@
         _model.ShortSummary = summary;
         _model.StartIndex = _model.Method == "random" ? -1 : _model.StartIndex;
         string userIds = string.Join(";", _users.Select(u => u.Id).ToList());
-        string usernames = string.Join(";", _users.Select(u => u.UserName).ToList());        
+        string usernames = string.Join(";", _users.Select(u => u.UserName).ToList());
         _model.AssessmentInfo = new AssessmentInfoModel
         {
             Name = _model.AssessmentInfoName,
