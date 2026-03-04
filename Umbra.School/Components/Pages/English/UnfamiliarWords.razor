@@ -1,18 +1,50 @@
-﻿@page "/english/words/unfamiliar"
+﻿@page "/english/words/unfamiliar/{alphabet}"
+@page "/english/words/unfamiliar/{start:int}/{end:int}"
 @attribute [Authorize]
 @using Umbra.School.Models.English
 @inject UserProvider UserProvider
 @inject IEnglishService EnglishService
+@inject NavigationManager NavigationManager
+
+<style>
+    .mud-toolbar {
+        justify-content: center;
+    }
+</style>
 
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
     <MudToolBar Dense="true">
         <MudText Typo="Typo.h6" Style="font-weight:bold;">我的生词库（共@(_totalItems)个）</MudText>
         <MudSpacer />
+        <MudForm>
+            <MudStack Style="width: 300px;" Row>
+                <MudTextField @bind-Value="@start" Style="width: 80px;" Mask="@(new RegexMask(@"^[0-9]\d*$"))" Label="从"></MudTextField>
+                <MudTextField @bind-Value="@end" Style="width: 80px;" Mask="@(new RegexMask(@"^[0-9]\d*$"))" Label="到"></MudTextField>
+                <MudIconButton Icon="@Icons.Material.Filled.Search" OnClick="FilterByIndex" ButtonType="ButtonType.Button"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Abc" OnClick="FilterByAbc" ButtonType="ButtonType.Button"></MudIconButton>
+            </MudStack>
+        </MudForm>
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
 <MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true">
+    <ToolBarContent>
+        <MudToolBar Dense="true">
+            @{
+                if (!string.IsNullOrEmpty(alphabet))
+                {
+                    var alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+                    foreach (var letter in alphabets)
+                    {
+                        <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/unfamiliar/{letter.ToString().ToLower()}")"
+                                 Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                    }
+                }
+            }
+            <MudSpacer />
+        </MudToolBar>
+    </ToolBarContent>
     <NoRecordsContent>
         <MudText Typo="Typo.body1">没有任何记录。</MudText>
     </NoRecordsContent>
@@ -40,6 +72,12 @@
 </MudDataGrid>
 
 @code {
+    [Parameter]
+    public string? alphabet { get; set; }
+    [Parameter]
+    public int? start { get; set; }
+    [Parameter]
+    public int? end { get; set; }
     MudDataGrid<EnglishWordModel> _dataGrid = new MudDataGrid<EnglishWordModel>();
     List<EnglishWordModel> _allItems { get; set; } = new();
     int _totalItems;
@@ -47,19 +85,23 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
         await LoadData();
+        StateHasChanged();
     }
 
     async Task LoadData()
     {
         var _currentUserId = (await UserProvider.GetUserAsync()).UserId;
         if (string.IsNullOrEmpty(_currentUserId)) return;
-        var result = await EnglishService.GetUnfamiliarEnglishWords(_currentUserId);
-        if (result == null) return;
-        if (result.Success)
+        var result = await EnglishService.GetUnfamiliarEnglishWords(_currentUserId, alphabet, start, end);
+        if (result != null && result.Success && result.Data != null)
         {
-            _allItems = result.Data?.EnglishWords ?? new List<EnglishWordModel>();
-            _totalItems = _allItems.Count;
+            _allItems = result.Data.EnglishWords ?? new List<EnglishWordModel>();
+            _totalItems = result.Data.TotalWordsOfBook;
         }
     }
 
@@ -69,6 +111,18 @@
         if (string.IsNullOrEmpty(_currentUsername)) return;
         var result = await EnglishService.RatingEnglishWord(_currentUsername, word.Id, val);
         StateHasChanged();
+    }
+
+    void FilterByIndex()
+    {
+        if (start == null || start <= 0) start = 1;
+        if (end == null || end <= 0) end = 0;
+        NavigationManager.NavigateTo($"/english/words/unfamiliar/{start}/{end}");
+    }
+
+    void FilterByAbc()
+    {
+        NavigationManager.NavigateTo($"/english/words/unfamiliar/a");
     }
 
 }

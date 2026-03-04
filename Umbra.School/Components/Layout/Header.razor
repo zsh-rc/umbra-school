@@ -23,12 +23,12 @@
     <MudSpacer />
     <MudSpacer />
     <MudSpacer />
-    <MudTextField T="string" Label="Search" Clearable="true" Underline="false"
-                  Variant="Variant.Filled" style="border-radius: 30px; "
-                  Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary"></MudTextField>
-    <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
     <AuthorizeView>
         <Authorized>
+            <MudTextField T="string" Label="Search" Clearable="true" Underline="false"
+                          Variant="Variant.Filled" style="border-radius: 30px; "
+                          Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary"></MudTextField>
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
             <MudMenu>
                 <ActivatorContent Context="acContext">
                     <MudAvatar Color="MudBlazor.Color.Primary">
@@ -48,7 +48,14 @@
             </form>
         </Authorized>
         <NotAuthorized>
-            <MudIconButton Icon="@Icons.Material.Filled.Login" OnClick="Login"></MudIconButton>
+            @if (RendererInfo.IsInteractive)
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Login" OnClick="Login"></MudIconButton>
+            }
+            else
+            {
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Href="/account/login"></MudIconButton>
+            }
         </NotAuthorized>
     </AuthorizeView>
     @if (RendererInfo.IsInteractive)

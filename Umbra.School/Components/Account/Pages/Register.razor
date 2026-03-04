@@ -17,7 +17,7 @@
 
 <PageTitle>Register</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">Register</MudText>
+<MudText Typo="Typo.h3" GutterBottom="true">注册新用户</MudText>
 
 <MudGrid>
     <MudItem md="6">
@@ -25,33 +25,31 @@
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator />
 
-            <MudText Typo="Typo.body1" GutterBottom="true">Create a new account.</MudText>
+            <MudText Typo="Typo.body1" GutterBottom="true">创建一个新的用户。</MudText>
 
             <MudGrid>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
-                                        Label="Email" Placeholder="name@example.com"
+                                        Label="电子邮箱" Placeholder="name@example.com"
                                         UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="Password" InputType="InputType.Password" Placeholder="password"
+                                        Label="密码" InputType="InputType.Password" Placeholder="password"
                                         UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
                     <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
-                                        Label="Confirm Password" InputType="InputType.Password" Placeholder="confirm password"
+                                        Label="确认密码" InputType="InputType.Password" Placeholder="confirm password"
                                         UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
                 </MudItem>
                 <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Register</MudStaticButton>
+                    <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" FormAction="FormAction.Submit">注册</MudStaticButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </MudItem>
     <MudItem md="6">
-        <MudText Typo="Typo.body1" GutterBottom="true">Use another service to register.</MudText>
-        <ExternalLoginPicker />
     </MudItem>
 </MudGrid>
 

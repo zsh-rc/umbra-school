@@ -44,7 +44,22 @@
                         </TemplateColumn>
                         <TemplateColumn Title="计划名称">
                             <CellTemplate>
-                                <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                                @if (context.Item.Method == "order")
+                                {
+                                    if (context.Item.Source == "Unfamiliar")
+                                    {
+                                        <MudLink Href="@($"english/words/unfamiliar/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                                    }
+                                    else
+                                    {
+                                        <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                                    }
+                                }
+                                else
+                                {
+                                    @context.Item.AssessmentInfoName
+                                }
+
                             </CellTemplate>
                         </TemplateColumn>
                         @* <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" /> *@

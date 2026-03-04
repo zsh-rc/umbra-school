@@ -131,7 +131,7 @@ namespace Umbra.School.Services
             };
         }
 
-        public async Task<ResponseModel<WordListModel>> GetUnfamiliarEnglishWords(string userId)
+        public async Task<ResponseModel<WordListModel>> GetUnfamiliarEnglishWords(string userId, string? alphabet, int? start, int? end)
         {
             var baseQuery = _context.EnglishWords.AsNoTracking();
 
@@ -140,10 +140,22 @@ namespace Umbra.School.Services
             var list = await baseQuery
                 .ProjectTo<EnglishWordModel>(_mapper.ConfigurationProvider, new { userId })
                 .Where(e => e.Rating >=1 && e.Rating <= 3)
-                .OrderBy(e => e.Word)
                 .ToListAsync();
 
-            var totalWordsOfBook = list.Count();
+            var totalWordsOfBook = list.Count();                      
+
+            if (!string.IsNullOrEmpty(alphabet))
+            {
+                list = list.Where(w => w.Word.StartsWith(alphabet)).ToList();
+            }
+
+            if (start != null || end != null)
+            {
+                var startIndex = (start == null ? 1 : start.Value);
+                var endIndex = (end == null ? totalWordsOfBook : end.Value);
+                var count = endIndex - startIndex + 1;
+                list = list.OrderBy(e => e.Sort).Skip(startIndex - 1).Take(count).ToList();
+            }
 
             return new ResponseModel<WordListModel>
             {

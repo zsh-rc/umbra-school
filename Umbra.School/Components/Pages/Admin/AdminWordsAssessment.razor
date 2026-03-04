@@ -49,7 +49,7 @@
                         <MudRadioGroup T="string" @bind-Value="_model.Source" For="@(() => _model.Source)" Required="true">
                             <MudRadio Value="@("Library")" Size="MudBlazor.Size.Small">词库&nbsp;<a href="/english/words/@(_model.Scope)/a">🔗</a></MudRadio>
                             <MudRadio Value="@("Unfamiliar")" Size="MudBlazor.Size.Small">生词（★&lt;=3）</MudRadio>
-                            <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio>
+                            @* <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio> *@
                         </MudRadioGroup>
                         <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users"
                                    SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<IReadOnlyList<string>, string>(GetMultiSelectionText))">
@@ -95,7 +95,14 @@
             <Columns>
                 <TemplateColumn Title="计划名称">
                     <CellTemplate>
-                        <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                        @if (context.Item.Source != "Unfamiliar" && context.Item.Method == "order")
+                        {
+                            <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                        }
+                        else
+                        {
+                            @context.Item.AssessmentInfoName
+                        }
                     </CellTemplate>
                 </TemplateColumn>
                 <PropertyColumn Title="针对用户" Property="x => x.AssessmentInfo.ForUserNames" />
@@ -216,7 +223,14 @@
             AppSnackbarService.ShowError("请至少选择一个用户。");
             return;
         }
-        _model.AssessmentInfoName = _model.AssessmentInfoName;
+        if (_model.Method == "order")
+        {
+            _model.AssessmentInfoName = $"{_model.AssessmentInfoName} (从{_model.StartIndex}开始，{_model.WordCount}以内 )";
+        }
+        else
+        {
+            _model.AssessmentInfoName = $"{_model.AssessmentInfoName} (随机，{_model.WordCount}以内 )";
+        }
         _model.Repeatable = _repeatable;
         var summary = $"{_scopes[_model.Scope]} » {_sources[_model.Source]}（{_model.WordCount}以内，{_methods[_model.Method]}{(_model.Method == "order" ? $"，从{_model.StartIndex}开始" : "")}）";
         _model.ShortSummary = summary;
