@@ -1,0 +1,13 @@
+﻿-- To update the Sort column in the EnglishWords table based on the Word column
+WITH UpdatedSort AS (
+    SELECT 
+        Sort, 
+        ROW_NUMBER() OVER (PARTITION BY Book ORDER BY Word) AS NewSequence
+    FROM EnglishWords
+)
+UPDATE UpdatedSort
+SET Sort = NewSequence;
+
+-- Delete with reset identity column
+DELETE FROM [dbo].[EnglishWords-xiaoran];
+DBCC CHECKIDENT ('EnglishWords-xiaoran', RESEED, 0);

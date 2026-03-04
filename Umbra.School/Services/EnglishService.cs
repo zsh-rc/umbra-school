@@ -108,14 +108,14 @@ namespace Umbra.School.Services
                 var startIndex = (start == null ? 1 : start.Value);
                 var endIndex = (end == null ? totalWordsOfBook : end.Value);
                 var count = endIndex - startIndex + 1;
-                baseQuery = baseQuery.OrderBy(e => e.Word).Skip(startIndex - 1).Take(count);
+                baseQuery = baseQuery.OrderBy(e => e.Sort).Skip(startIndex - 1).Take(count);
             }
 
             // Project directly to the model (AutoMapper handles the LEFT JOIN to UserRatings)
             // Pass userId as a parameter for the Mapping Profile
             var list = await baseQuery
                 .ProjectTo<EnglishWordModel>(_mapper.ConfigurationProvider, new { userId })
-                .OrderBy(e => e.Word)
+                .OrderBy(e => e.Sort)
                 .ToListAsync();
 
             return new ResponseModel<WordListModel>

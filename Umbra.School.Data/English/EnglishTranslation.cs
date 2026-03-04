@@ -12,5 +12,6 @@ namespace Umbra.School.Data.English
         [Required]
         public string Translation { get; set; } = string.Empty;
         public string? Remark { get; set; }
+        public int Sort { get; set; }
     }
 }
