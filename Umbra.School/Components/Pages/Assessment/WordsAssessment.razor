@@ -12,7 +12,7 @@
     <MudToolBar Dense="true">
         <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇专项测试</MudText>
         <MudSpacer />
-@*         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+        @*         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.Newspaper">提交测试</MudButton>
         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.LibraryBooks">错题本</MudButton>
@@ -42,7 +42,12 @@
 
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
+                        <TemplateColumn Title="计划名称">
+                            <CellTemplate>
+                                <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        @* <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" /> *@
                         <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
                         <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
                         <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
@@ -110,14 +115,14 @@
         @* <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" /> *@
         <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" />
     </MudTabPanel>
-@*     <MudTabPanel Text="测试详细信息">
+    @*     <MudTabPanel Text="测试详细信息">
         <WordsAssessmentDetailComponent CurrentUserId="@_currentUserId" Assessment="@_selectedAssessment" />
     </MudTabPanel> *@
 </MudTabs>
 
 @code {
     string _currentUserId = string.Empty;
-    private MudTabs _tabs = new ();
+    private MudTabs _tabs = new();
 
     MudStepper _stepper = new();
 
@@ -342,5 +347,5 @@
     //     await _tabs.ActivatePanelAsync(2);
     // }
 
-    
+
 }

@@ -61,8 +61,8 @@
                     </MudField>
                     <MudField Label="词汇数量（最大）" Variant="Variant.Outlined">
                         <MudRadioGroup T="Int32" @bind-Value="_model.WordCount" For="@(() => _model.WordCount)" Required="true">
-                            <MudRadio Value="10" Size="MudBlazor.Size.Small">10</MudRadio>
                             <MudRadio Value="15" Size="MudBlazor.Size.Small">15</MudRadio>
+                            <MudRadio Value="20" Size="MudBlazor.Size.Small">20</MudRadio>
                             <MudRadio Value="30" Size="MudBlazor.Size.Small">30</MudRadio>
                             <MudRadio Value="50" Size="MudBlazor.Size.Small">50</MudRadio>
                             <MudRadio Value="100" Size="MudBlazor.Size.Small">100</MudRadio>
@@ -93,7 +93,11 @@
                 <MudText Typo="Typo.body1">尚未制定任何测试计划。</MudText>
             </NoRecordsContent>
             <Columns>
-                <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" />
+                <TemplateColumn Title="计划名称">
+                    <CellTemplate>
+                        <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                    </CellTemplate>
+                </TemplateColumn>
                 <PropertyColumn Title="针对用户" Property="x => x.AssessmentInfo.ForUserNames" />
                 <TemplateColumn Title="删除">
                     <CellTemplate>

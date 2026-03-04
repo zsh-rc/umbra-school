@@ -71,9 +71,10 @@ namespace Umbra.School.Services
                 if (model.Source == "Library")
                 {
                     var query = _context.EnglishWords.Where(w => w.Book == model.Scope);
+                    // Must order by "Sort" field.
                     var wordList = query
                         .Where(w => w != null)
-                        .OrderBy(w => w.Word)
+                        .OrderBy(w => w.Sort)
                         .Skip(model.StartIndex - 1)
                         .Select(w => w!)
                         .ToList();
@@ -122,25 +123,32 @@ namespace Umbra.School.Services
                         int endIndex = startIndex + countPerDay - 1;
                         if (endIndex > wordsCount - 1) countPerDay = wordsCount - startIndex;
                         if (startIndex >= wordsCount) break;
+                        // The start and end are used for real index in the whole database.
+                        // They are used in WordsAssessments and AssessmentInfoName
+                        int start = model.StartIndex + i * countPerDay;
+                        int end = start + countPerDay - 1;
 
-                        // Add Words Assessment                        
+                        // Add WordsAssessmentInfo
                         var wordAssessment = _mapper.Map<WordsAssessment>(model);
-                        wordAssessment.Id = Guid.NewGuid(); // regenerate id for each day
                         var assessmentInfo = wordAssessment.AssessmentInfo;
                         wordAssessment.AssessmentInfo = null;
                         if (assessmentInfo == null) throw new Exception("No assessment information found.");
                         assessmentInfo.Id = Guid.NewGuid();
-                        assessmentInfo.Name = $"{model.AssessmentInfoName} (DAY{i}：{startIndex + 1}-{endIndex + 1})";
-                        var summary = $"{Dictionaries.WordsAssessmentScopes[model.Scope]} » {Dictionaries.WordsAssessmentSources[model.Source]}（{model.WordCount}以内，{Dictionaries.WordsAssessmentMethods[model.Method]}{(model.Method == "order" ? $"，从{startIndex + 1}开始" : "")}）";
+                        assessmentInfo.Name = $"{model.AssessmentInfoName} (DAY{i.ToString("D2")}：{start}-{end})";
+                        var summary = $"{Dictionaries.WordsAssessmentScopes[model.Scope]} » {Dictionaries.WordsAssessmentSources[model.Source]}（{model.WordCount}以内，{Dictionaries.WordsAssessmentMethods[model.Method]}{(model.Method == "order" ? $"，从{start}开始" : "")}）";
                         assessmentInfo.ShortSummary = summary;
                         await _context.AssessmentInfos.AddAsync(assessmentInfo);
+                        // Add Words Assessment
+                        wordAssessment.Id = Guid.NewGuid(); // regenerate id for each day
                         wordAssessment.AssessmentInfoId = assessmentInfo.Id;
-
+                        wordAssessment.StartIndex = start;
+                        wordAssessment.WordCount = countPerDay;
                         await _context.WordsAssessments.AddAsync(wordAssessment);
 
+                        // Must order by "Sort" field.
                         var assessmentWordList = wordList
                             .Where(w => w != null)
-                            .OrderBy(w => w.Word)
+                            .OrderBy(w => w.Sort)
                             .Skip(startIndex)
                             .Take(countPerDay)
                             .Select(w => w!)
@@ -200,9 +208,10 @@ namespace Umbra.School.Services
                     }
                     else
                     {
+                        // Must order by "Sort" field.
                         wordList = query
                             .Where(w => w != null)
-                            .OrderBy(w => w.Word)
+                            .OrderBy(w => w.Sort)
                             .Skip(model.StartIndex - 1)
                             .Take(model.WordCount)
                             .Select(w => w!)
