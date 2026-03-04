@@ -61,6 +61,8 @@
                     </MudField>
                     <MudField Label="词汇数量（最大）" Variant="Variant.Outlined">
                         <MudRadioGroup T="Int32" @bind-Value="_model.WordCount" For="@(() => _model.WordCount)" Required="true">
+                            <MudRadio Value="10" Size="MudBlazor.Size.Small">10</MudRadio>
+                            <MudRadio Value="15" Size="MudBlazor.Size.Small">15</MudRadio>
                             <MudRadio Value="30" Size="MudBlazor.Size.Small">30</MudRadio>
                             <MudRadio Value="50" Size="MudBlazor.Size.Small">50</MudRadio>
                             <MudRadio Value="100" Size="MudBlazor.Size.Small">100</MudRadio>
