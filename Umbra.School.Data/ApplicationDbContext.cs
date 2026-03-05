@@ -36,6 +36,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
         // Customize the ASP.NET Identity model and override the defaults.
         modelBuilder.Entity<ApplicationUser>().ToTable("Users");
         // Rename the AspNetRoles table to 'Roles'

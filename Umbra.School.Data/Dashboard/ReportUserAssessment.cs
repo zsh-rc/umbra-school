@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,7 @@ namespace Umbra.School.Data.Dashboard
         public Guid AssessmentInfoId { get; set; }
         public string AssessmentInfoName { get; set; } = string.Empty;
         public int WordsCountInvolved { get; set; }
+        [Precision(18, 2)]
         public decimal Score { get; set; }
     }
 }

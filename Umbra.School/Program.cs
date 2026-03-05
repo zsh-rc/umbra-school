@@ -91,10 +91,6 @@ else
 
 app.UseHttpsRedirection();
 
-// Zach 5-Mar-26: For CoravelPro Configurations
-app.MapRazorPages();
-app.UseCoravelPro();
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
@@ -110,5 +106,9 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
 }
+
+// Zach 5-Mar-26: For CoravelPro Configurations (This must be after the database migration to ensure the CoravelPro tables are created)
+app.MapRazorPages();
+app.UseCoravelPro();
 
 app.Run();
