@@ -3,12 +3,12 @@
 @inject IDialogService DialogService
 
 <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-             MultiSelection="false"SelectOnRowClick="false">
+             MultiSelection="false" SelectOnRowClick="false">
     <NoRecordsContent>
         <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
     </NoRecordsContent>
     <Columns>
-@*         <TemplateColumn Title="计划名称">
+        @*         <TemplateColumn Title="计划名称">
             <CellTemplate>
                 <MudLink OnClick="@(() => NotifySelectedAssessment(context.Item))">@context.Item.AssessmentInfoName</MudLink>
             </CellTemplate>
@@ -35,13 +35,13 @@
         </TemplateColumn>
         <TemplateColumn Title="状态">
             <CellTemplate>
-                <MudLink OnClick="@(() => ShowDetails(context.Item))">@context.Item.AssessmentResult.Status</MudLink>
+                <MudLink OnClick="@(() => ShowDetails(context.Item))">@context.Item.AssessmentResult!.Status</MudLink>
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
-        <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
-        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
-        <PropertyColumn Title="分数" Property="x => x.AssessmentResult.Score" />
+        <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult!.StartTime" />
+        <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult!.EndTime" />
+        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult!.Duration" />
+        <PropertyColumn Title="分数" Property="x => x.AssessmentResult!.Score" />
     </Columns>
 </MudDataGrid>
 
@@ -65,7 +65,7 @@
         var result = await AssessmentService.GetWordsAssessments(CurrentUserId);
         if (result != null && result.Success && result.Data != null)
         {
-            _assessments = result.Data.Where(a=> a.AssessmentResult!.Status == AssessmentStatus.Reviewed.GetDescription()).ToList();
+            _assessments = result.Data.Where(x => x.AssessmentResult != null && x.AssessmentResult.Status == AssessmentStatus.Reviewed.GetDescription()).ToList();
         }
     }
 

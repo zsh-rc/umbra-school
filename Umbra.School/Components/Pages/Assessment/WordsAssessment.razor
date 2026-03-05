@@ -62,9 +62,9 @@
 
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
-                        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
-                        <PropertyColumn Title="分数" Property="x => x.AssessmentResult.Score" />
+                        <PropertyColumn Title="状态" Property="x => x.AssessmentResult!.Status" />
+                        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult!.Duration" />
+                        <PropertyColumn Title="分数" Property="x => x.AssessmentResult!.Score" />
                     </Columns>
                 </MudDataGrid>
             </MudStep>

@@ -74,6 +74,18 @@
                         <Columns>
                             <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
                             <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    @if (context.Item.Correct.HasValue && context.Item.Correct.Value)
+                                    {
+                                        <MudText Color="MudBlazor.Color.Success">@context.Item.Answer</MudText>
+                                    }
+                                    else if (context.Item.Correct.HasValue && !context.Item.Correct.Value)
+                                    {
+                                        <MudText Color="MudBlazor.Color.Error">@context.Item.Answer</MudText>
+                                    }
+                                </CellTemplate>
+                            </TemplateColumn>
                             <PropertyColumn Title="正确答案" Property="x => x.Word" Editable="true" />
                             <TemplateColumn>
                                 <CellTemplate>
@@ -177,7 +189,7 @@
     }
 
     async Task ChangeRating(WordsAssessmentDetailModel model, int val)
-    {        
+    {
         var result = await EnglishService.RatingEnglishWord(model.UserId, model.WordId, val);
         StateHasChanged();
     }
