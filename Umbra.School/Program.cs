@@ -1,3 +1,5 @@
+using ApexCharts;
+using Coravel.Pro;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +71,10 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();
 builder.Services.AddScoped<UserProvider>();
 
+// Zach 5-Mar-26: Add CoravelPro services
+builder.Services.AddCoravelPro(typeof(ApplicationDbContext));
+builder.Services.AddRazorPages().AddNewtonsoftJson();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -85,6 +91,9 @@ else
 
 app.UseHttpsRedirection();
 
+// Zach 5-Mar-26: For CoravelPro Configurations
+app.MapRazorPages();
+app.UseCoravelPro();
 
 app.UseAntiforgery();
 

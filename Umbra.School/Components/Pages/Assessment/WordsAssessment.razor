@@ -62,10 +62,7 @@
 
                             </CellTemplate>
                         </TemplateColumn>
-                        @* <PropertyColumn Title="计划名称" Property="x => x.AssessmentInfoName" /> *@
                         <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
-                        <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
-                        <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
                         <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
                         <PropertyColumn Title="分数" Property="x => x.AssessmentResult.Score" />
                     </Columns>

@@ -1,8 +1,10 @@
+using Coravel.Pro.EntityFramework;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Umbra.School.Data.Assessment;
 using Umbra.School.Data.Chinese;
+using Umbra.School.Data.Dashboard;
 using Umbra.School.Data.English;
 using Umbra.School.Data.Notebook;
 using Umbra.School.Data.PersonalData;
@@ -10,8 +12,13 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Umbra.School.Data;
 
-public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options)
+public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser, ApplicationRole, string>(options), ICoravelProDbContext
 {
+
+    public DbSet<CoravelJobHistory> Coravel_JobHistory { get; set; }
+    public DbSet<CoravelScheduledJob> Coravel_ScheduledJobs { get; set; }
+    public DbSet<CoravelScheduledJobHistory> Coravel_ScheduledJobHistory { get; set; }
+
     public DbSet<EnglishWord> EnglishWords { get; set; }
     public DbSet<EnglishPhrase> EnglishPhrases { get; set; }
     public DbSet<EnglishTranslation> EnglishTranslations { get; set; }
@@ -22,6 +29,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<WordsAssessment> WordsAssessments { get; set; }
     public DbSet<WordsAssessmentDetail> WordsAssessmentDetails { get; set; }
     public DbSet<NotebookInfo> NotebookInfos { get; set; }
+
+    public DbSet<ReportEnWordsCount> ReportEnWordsCounts { get; set; }
+    public DbSet<ReportUserAssessment> ReportUserAssessments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

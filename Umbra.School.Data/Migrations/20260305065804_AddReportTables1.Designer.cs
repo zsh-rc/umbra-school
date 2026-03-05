@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Umbra.School.Data;
 
@@ -11,9 +12,11 @@ using Umbra.School.Data;
 namespace Umbra.School.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305065804_AddReportTables1")]
+    partial class AddReportTables1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -593,37 +596,28 @@ namespace Umbra.School.Migrations
                     b.ToTable("ChineseClassicalQuestions");
                 });
 
-            modelBuilder.Entity("Umbra.School.Data.Dashboard.ReportEnWordsCount", b =>
+            modelBuilder.Entity("Umbra.School.Data.Dashboard.ReportCount", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Book")
+                    b.Property<string>("Category")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WordsCount")
+                    b.Property<int>("Count")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportEnWordsCounts");
+                    b.ToTable("ReportCounts");
                 });
 
             modelBuilder.Entity("Umbra.School.Data.Dashboard.ReportUserAssessment", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AssessmentInfoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AssessmentInfoName")
@@ -633,8 +627,8 @@ namespace Umbra.School.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("Score")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()

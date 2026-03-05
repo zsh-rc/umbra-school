@@ -11,9 +11,9 @@
     <MudGrid>
         <MudItem xs="12" sm="6" md="4">
             <MudPaper Elevation="2" Class="pa-4">
-                <ApexChart TItem="EnglishWordsCountModel"
+                <ApexChart TItem="ReportEnWordsCountModel"
                            Title="词汇库" Options="_englishWordsCountSeriesBarChartOptions">
-                    <ApexPointSeries TItem="EnglishWordsCountModel"
+                    <ApexPointSeries TItem="ReportEnWordsCountModel"
                                      Items="_englishWordsCount"
                                      Name="词汇数量"
                                      XValue="@(e => Dictionaries.WordsAssessmentScopes[e.Book])"
@@ -27,24 +27,24 @@
         </MudItem>
         <MudItem xs="12" sm="6" md="8">
             <MudPaper Elevation="2" Class="pa-4">
-                <ApexChart TItem="EnglishWordsAssessmentResultModel"
+                <ApexChart TItem="ReportUserAssessmentModel"
                            Title="我的测试统计"
                            Options="_assessmentMixedChartOptions">
 
-                    <ApexPointSeries TItem="EnglishWordsAssessmentResultModel"
+                    <ApexPointSeries TItem="ReportUserAssessmentModel"
                                      Items="_myAssessmentResults"
                                      Name="词汇数量"
                                      SeriesType="SeriesType.Bar"
                                      XValue="@(e => e.AssessmentInfoName)"
-                                     YValue="@(e => (decimal)e.WordsCount)"
+                                     YValue="@(e => (decimal)e.WordsCountInvolved)"
                                      ShowDataLabels="false" />
 
-                    <ApexPointSeries TItem="EnglishWordsAssessmentResultModel"
+                    <ApexPointSeries TItem="ReportUserAssessmentModel"
                                      Items="_myAssessmentResults"
                                      Name="分数"
                                      SeriesType="SeriesType.Line"
                                      XValue="@(e => e.AssessmentInfoName)"
-                                     YValue="@(e => e.Score ?? 0)" 
+                                     YValue="@(e => e.Score)" 
                                      ShowDataLabels="true" />
                 </ApexChart>
             </MudPaper>
@@ -54,9 +54,9 @@
 
 @code {
     string _currentUserId = string.Empty;
-    List<EnglishWordsCountModel> _englishWordsCount = new List<EnglishWordsCountModel>();
+    List<ReportEnWordsCountModel> _englishWordsCount = new List<ReportEnWordsCountModel>();
     List<ChartSeries<int>> _englishWordsCountSeries = new();
-    ApexChartOptions<EnglishWordsCountModel> _englishWordsCountSeriesBarChartOptions = new()
+    ApexChartOptions<ReportEnWordsCountModel> _englishWordsCountSeriesBarChartOptions = new()
     {
         Yaxis = new List<YAxis> { new YAxis { Show = false } },
         Grid = new Grid
@@ -85,39 +85,21 @@
         },
         Chart = new Chart { Height = 300 },
     };
-    private string? HighlightUnfamiliarColor(EnglishWordsCountModel model)
+    private string? HighlightUnfamiliarColor(ReportEnWordsCountModel model)
     {
         if (model.Book == "myu") { return "#FF5734"; }
         return null;
     }
 
-    List<EnglishWordsAssessmentResultModel> _myAssessmentResults = new List<EnglishWordsAssessmentResultModel>();
-    ApexChartOptions<EnglishWordsAssessmentResultModel> _assessmentMixedChartOptions = new();
+    List<ReportUserAssessmentModel> _myAssessmentResults = new List<ReportUserAssessmentModel>();
+    ApexChartOptions<ReportUserAssessmentModel> _assessmentMixedChartOptions = new();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         _currentUserId = (await UserProvider.GetUserAsync()).UserId;
-        await LoadEnglishWordsCount();
-        await LoadAssessmentResultsData();
+        await LoadDashboardData();
         DefineAssessmentResultChartOptions();
-    }
-
-    async Task LoadEnglishWordsCount()
-    {
-        var result = await DashboardService.GetEnglishWordsCount(_currentUserId);
-        if (result.Data != null && result.Success)
-        {
-            _englishWordsCount = result.Data;
-            _englishWordsCount.ForEach(x =>
-            {
-                _englishWordsCountSeries.Add(new ChartSeries<int>
-                {
-                    Name = Dictionaries.WordsAssessmentScopes[x.Book],
-                    Data = new List<int> { x.WordsCount }
-                });
-            });
-        }
     }
 
     void DefineAssessmentResultChartOptions()
@@ -139,7 +121,7 @@
             .ToList();
 
         // 3. Configure the Chart Options
-        _assessmentMixedChartOptions = new ApexChartOptions<EnglishWordsAssessmentResultModel>
+        _assessmentMixedChartOptions = new ApexChartOptions<ReportUserAssessmentModel>
         {
             Xaxis = new XAxis
             {
@@ -216,13 +198,10 @@
         };
     }
 
-    async Task LoadAssessmentResultsData()
+    async Task LoadDashboardData()
     {
-        var result = await DashboardService.GetAssessmentResults(_currentUserId);
-        if (result.Data != null && result.Success)
-        {
-            _myAssessmentResults = result.Data;
-        }
+        _englishWordsCount = await DashboardService.GetReportEnWordsCounts(_currentUserId);
+        _myAssessmentResults = await DashboardService.GetReportUserAssessments(_currentUserId);
     }
 
 }

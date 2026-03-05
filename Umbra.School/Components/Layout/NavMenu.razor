@@ -32,6 +32,7 @@
     </AuthorizeView>
     <AuthorizeView Roles="Administrators">
         <Authorized>
+            <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard">后台管理面板</MudNavLink>
             <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment")" Icon="@Icons.Material.Filled.Book">
                 <MudNavGroup Title="英语词汇专项测试" Expanded="false" Icon="@Icons.Material.Filled.Book">
                     <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>

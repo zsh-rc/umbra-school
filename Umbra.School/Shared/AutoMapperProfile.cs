@@ -3,11 +3,13 @@ using Umbra.School.Data;
 using Umbra.School.Data.Assessment;
 using Umbra.School.Data.Blog;
 using Umbra.School.Data.Chinese;
+using Umbra.School.Data.Dashboard;
 using Umbra.School.Data.English;
 using Umbra.School.Data.Notebook;
 using Umbra.School.Models.Account;
 using Umbra.School.Models.Assessment;
 using Umbra.School.Models.Chinese;
+using Umbra.School.Models.Dashboard;
 using Umbra.School.Models.English;
 using Umbra.School.Models.Notebook;
 
@@ -58,6 +60,13 @@ namespace Umbra.School.Shared
             #region Notebook
             CreateMap<NotebookInfo, NotebookInfoModel>().ReverseMap();
             CreateProjection<NotebookInfo, NotebookInfoModel>();
+            #endregion
+
+            #region Report
+            CreateMap<ReportEnWordsCount, ReportEnWordsCountModel>().ReverseMap();
+            CreateProjection<ReportEnWordsCount, ReportEnWordsCountModel>();
+            CreateMap<ReportUserAssessment, ReportUserAssessmentModel>().ReverseMap();
+            CreateProjection<ReportUserAssessment, ReportUserAssessmentModel>();
             #endregion
         }
     }

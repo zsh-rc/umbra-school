@@ -6,7 +6,8 @@ namespace Umbra.School.Services
 {
     public interface IDashboardService
     {
-        Task<ResponseModel<List<EnglishWordsCountModel>>> GetEnglishWordsCount(string userId);
-        Task<ResponseModel<List<EnglishWordsAssessmentResultModel>>> GetAssessmentResults(string userId);
+        Task DashboardDataStatistics();
+        Task<List<ReportEnWordsCountModel>> GetReportEnWordsCounts(string userId);
+        Task<List<ReportUserAssessmentModel>> GetReportUserAssessments(string userId);
     }
 }
