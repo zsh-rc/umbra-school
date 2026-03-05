@@ -15,10 +15,29 @@
         </TemplateColumn> *@
         <TemplateColumn Title="计划名称">
             <CellTemplate>
-                <MudLink OnClick="@(() => ShowDetails(context.Item))">@context.Item.AssessmentInfoName</MudLink>
+                @if (context.Item.Method == "order")
+                {
+                    if (context.Item.Source == "Unfamiliar")
+                    {
+                        <MudLink Href="@($"english/words/unfamiliar/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                    }
+                    else
+                    {
+                        <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
+                    }
+                }
+                else
+                {
+                    @context.Item.AssessmentInfoName
+                }
+
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="状态" Property="x => x.AssessmentResult.Status" />
+        <TemplateColumn Title="状态">
+            <CellTemplate>
+                <MudLink OnClick="@(() => ShowDetails(context.Item))">@context.Item.AssessmentResult.Status</MudLink>
+            </CellTemplate>
+        </TemplateColumn>
         <PropertyColumn Title="开始时间" Property="x => x.AssessmentResult.StartTime" />
         <PropertyColumn Title="结束时间" Property="x => x.AssessmentResult.EndTime" />
         <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult.Duration" />
@@ -46,7 +65,7 @@
         var result = await AssessmentService.GetWordsAssessments(CurrentUserId);
         if (result != null && result.Success && result.Data != null)
         {
-            _assessments = result.Data;
+            _assessments = result.Data.Where(a=> a.AssessmentResult!.Status == AssessmentStatus.Reviewed.GetDescription()).ToList();
         }
     }
 

@@ -40,6 +40,8 @@
                         <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/unfamiliar/{letter.ToString().ToLower()}")"
                                  Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
                     }
+                    <MudChip T="string" Variant="@("all" == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/unfamiliar/all")"
+                             Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">All</MudChip>
                 }
             }
             <MudSpacer />
@@ -97,7 +99,12 @@
     {
         var _currentUserId = (await UserProvider.GetUserAsync()).UserId;
         if (string.IsNullOrEmpty(_currentUserId)) return;
-        var result = await EnglishService.GetUnfamiliarEnglishWords(_currentUserId, alphabet, start, end);
+        var abc = alphabet;
+        if (alphabet!= null && alphabet.ToLower() == "all")
+        {
+            abc = string.Empty;
+        }
+        var result = await EnglishService.GetUnfamiliarEnglishWords(_currentUserId, abc, start, end);
         if (result != null && result.Success && result.Data != null)
         {
             _allItems = result.Data.EnglishWords ?? new List<EnglishWordModel>();

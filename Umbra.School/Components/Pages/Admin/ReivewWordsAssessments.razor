@@ -2,6 +2,7 @@
 @attribute [Authorize(Roles = "Administrators")]
 @using Umbra.School.Models.Assessment
 @inject IAssessmentService AssessmentService
+@inject IEnglishService EnglishService
 @inject UserProvider UserProvider
 
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
@@ -78,14 +79,21 @@
                                 <CellTemplate>
                                     @if (context.Item.Correct.HasValue && context.Item.Correct.Value)
                                     {
-                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Check" Color="MudBlazor.Color.Success" OnClick="@(() => Rectify(context.Item))" 
+                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Check" Color="MudBlazor.Color.Success" OnClick="@(() => Rectify(context.Item))"
                                                        Disabled="@(_selectedAssessmentResult == null || _selectedAssessmentResult.Status != AssessmentStatus.Submitted.GetDescription())" />
                                     }
                                     else if (context.Item.Correct.HasValue && !context.Item.Correct.Value)
                                     {
-                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Close" Color="MudBlazor.Color.Error" OnClick="@(() => Rectify(context.Item))" 
+                                        <MudIconButton Variant="Variant.Text" Icon="@Icons.Material.Filled.Close" Color="MudBlazor.Color.Error" OnClick="@(() => Rectify(context.Item))"
                                                        Disabled="@(_selectedAssessmentResult == null || _selectedAssessmentResult.Status != AssessmentStatus.Submitted.GetDescription())" />
                                     }
+                                </CellTemplate>
+                            </TemplateColumn>
+                            <TemplateColumn Title="修改">
+                                <CellTemplate>
+                                    <MudRating Size="@MudBlazor.Size.Small"
+                                               EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
+                                               SelectedValue="@context.Item.UserRating.Value" SelectedValueChanged="@(val => ChangeRating(context.Item, val))" />
                                 </CellTemplate>
                             </TemplateColumn>
                         </Columns>
@@ -165,6 +173,12 @@
         _selectedAssessmentResult.Status = AssessmentStatus.Reviewed.GetDescription();
         var result = await AssessmentService.SubmitReviewResult(_selectedAssessmentResult);
         await LoadWordsAssessmentResults();
+        StateHasChanged();
+    }
+
+    async Task ChangeRating(WordsAssessmentDetailModel model, int val)
+    {        
+        var result = await EnglishService.RatingEnglishWord(model.UserId, model.WordId, val);
         StateHasChanged();
     }
 

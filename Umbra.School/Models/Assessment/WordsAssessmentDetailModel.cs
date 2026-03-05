@@ -20,5 +20,7 @@ namespace Umbra.School.Models.Assessment
         
         public string? Answer { get; set; } = string.Empty;
         public bool? Correct {  get; set; }
+
+        public int? UserRating { get; set; }
     }
 }

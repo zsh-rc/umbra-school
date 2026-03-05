@@ -86,8 +86,8 @@
                         <MudForm Class="px-20 py-8">
                             <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
                                           AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" ReadOnly /><br /><br />
-                            <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "new-password" } })"
-                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true"
+                            <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "off" } })"
+                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true" 
                                           AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
                             <MudPaper Class="pa-4 mt-4" Elevation="0">
                                 <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
@@ -171,7 +171,7 @@
         var result = await AssessmentService.GetWordsAssessments(_currentUserId);
         if (result != null && result.Success && result.Data != null)
         {
-            _assessments = result.Data;
+            _assessments = result.Data.Where(a => a.AssessmentResult == null || a.AssessmentResult.Status != AssessmentStatus.Reviewed.GetDescription()).ToList();
         }
     }
 

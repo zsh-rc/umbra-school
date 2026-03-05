@@ -5,6 +5,7 @@
 @using Umbra.School.Models.English
 @inject IEnglishService EnglishService
 @inject NavigationManager NavigationManager
+@inject UserProvider UserProvider
 
 <style>
     .mud-toolbar {
@@ -91,7 +92,7 @@
     public int? end { get; set; }
     [CascadingParameter]
     private Task<AuthenticationState> authStateTask { get; set; }
-    private string? username;
+    private string? _currentUserId;
 
     MudDataGrid<EnglishWordModel> _dataGrid = new MudDataGrid<EnglishWordModel>();
     List<EnglishWordModel> _allItems { get; set; } = new();
@@ -106,7 +107,7 @@
 
         if (user.Identity is { IsAuthenticated: true })
         {
-            username = user.Identity.Name;
+            _currentUserId = (await UserProvider.GetUserAsync()).UserId;
         }
     }
 
@@ -118,8 +119,8 @@
 
     async Task LoadData()
     {
-        if (string.IsNullOrEmpty(username)) return;
-        var result = await EnglishService.GetEnglishWordsWithRatings(username, book, alphabet, start, end);
+        if (string.IsNullOrEmpty(_currentUserId)) return;
+        var result = await EnglishService.GetEnglishWordsWithRatings(_currentUserId, book, alphabet, start, end);
         if (result == null) return;
         if (result.Success)
         {
@@ -132,8 +133,8 @@
 
     async Task Rating(EnglishWordModel word, int val)
     {
-        if (string.IsNullOrEmpty(username)) return;
-        var result = await EnglishService.RatingEnglishWord(username, word.Id, val);
+        if (string.IsNullOrEmpty(_currentUserId)) return;
+        var result = await EnglishService.RatingEnglishWord(_currentUserId, word.Id, val);
         StateHasChanged();
     }
 

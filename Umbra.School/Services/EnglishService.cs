@@ -82,9 +82,8 @@ namespace Umbra.School.Services
             return Task.FromResult(result);
         }
 
-        public async Task<ResponseModel<WordListModel>> GetEnglishWordsWithRatings(string username, string? book, string? alphabet, int? start, int? end)
+        public async Task<ResponseModel<WordListModel>> GetEnglishWordsWithRatings(string userId, string? book, string? alphabet, int? start, int? end)
         {
-            var userId = _context.Users.First(u => u.NormalizedUserName == username.ToUpper()).Id;
             // 1. Prepare base query with NoTracking for speed
             var baseQuery = _context.EnglishWords.AsNoTracking();
 
@@ -170,24 +169,10 @@ namespace Umbra.School.Services
             };
         }
 
-        public async Task<ResponseModel<bool>> RatingEnglishWord(string username, Guid wordId, int rating)
+        public async Task<ResponseModel<bool>> RatingEnglishWord(string userId, Guid wordId, int rating)
         {
             try
             {
-                var normalizedUsername = username?.ToUpperInvariant();
-                var user = _context.Users.FirstOrDefault(u => u.NormalizedUserName == normalizedUsername);
-                if (user == null)
-                {
-                    var notFoundUser = new ResponseModel<bool>()
-                    {
-                        Success = false,
-                        Data = false,
-                        Code = "USER-NOT-FOUND",
-                        Message = "User not found."
-                    };
-                    return notFoundUser;
-                }
-
                 var word = _context.EnglishWords.FirstOrDefault(w => w.Id == wordId);
                 if (word == null)
                 {
@@ -201,13 +186,13 @@ namespace Umbra.School.Services
                     return notFoundWord;
                 }
 
-                var findRating = _context.UserEnglishWordRatings.FirstOrDefault(r => r.UserId == user.Id && r.WordId == wordId);
+                var findRating = _context.UserEnglishWordRatings.FirstOrDefault(r => r.UserId == userId && r.WordId == wordId);
                 if (findRating == null)
                 {
                     _context.Add(new UserEnglishWordRating()
                     {
                         Id = Guid.NewGuid(),
-                        UserId = user.Id,
+                        UserId = userId,
                         WordId = wordId,
                         Rating = rating,
                         LastReviewed = DateTime.UtcNow,

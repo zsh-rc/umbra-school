@@ -93,7 +93,7 @@ namespace Umbra.School.Services
                     {
                         var wordList = _context.UserEnglishWordRatings
                             .Include(r => r.EnglishWord)
-                            .Where(r => r.UserId == userId && r.Rating >=1 && r.Rating <= 3)
+                            .Where(r => r.UserId == userId && r.Rating >= 1 && r.Rating <= 3)
                             .OrderBy(r => r.EnglishWord.Word)
                             .Skip(model.StartIndex - 1)
                             .Select(r => r.EnglishWord)
@@ -345,10 +345,26 @@ namespace Umbra.School.Services
 
         public Task<ResponseModel<List<WordsAssessmentDetailModel>>> GetWordsAssessmentDetails(string userId, Guid assessmentInfoId)
         {
-            var query = _context.WordsAssessmentDetails
-                .Where(d => d.WordsAssessment.AssessmentInfoId == assessmentInfoId && d.UserId == userId)
-                .OrderBy(d => d.Word);
-            var list = _mapper.ProjectTo<WordsAssessmentDetailModel>(query).ToList();
+            var list = _context.WordsAssessmentDetails
+                .Where(d => d.WordsAssessment!.AssessmentInfoId == assessmentInfoId && d.UserId == userId)
+                .Join(_context.EnglishWords, wad => wad.WordId, ew => ew.Id, (wad, ew) => new { wad, ew })
+                .LeftJoin(_context.UserEnglishWordRatings.Where(uwr => uwr.UserId == userId),
+                    r => new { r.wad.UserId, WordId = r.ew.Id },
+                    uwr => new { uwr.UserId, uwr.WordId },
+                    (r, uwr) => new WordsAssessmentDetailModel
+                    {
+                        Id = r.wad.Id,
+                        Meaning = r.wad.Meaning,
+                        UserId = r.wad.UserId,
+                        WordId = r.wad.WordId,
+                        Answer = r.wad.Answer,
+                        Correct = r.wad.Correct,
+                        WordsAssessementId = r.wad.WordsAssessementId,
+                        Word = r.wad.Word,
+                        UserRating = uwr != null ? uwr.Rating : 0
+                    })
+                .OrderBy(d => d.Word).ToList();
+            //var list = _mapper.ProjectTo<WordsAssessmentDetailModel>(query).ToList();
             var result = new ResponseModel<List<WordsAssessmentDetailModel>>()
             {
                 Success = true,
