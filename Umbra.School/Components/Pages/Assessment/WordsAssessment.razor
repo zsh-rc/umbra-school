@@ -59,12 +59,12 @@
                                 {
                                     @context.Item.AssessmentInfoName
                                 }
-
+                                <MudTooltip Text="建议正式测验前进行考前练习，有助于提高分数哦。" Placement="Placement.Right" Arrow="true">
+                                    <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Visibility" Class="ml-10"
+                                               OnClick="@(() => StartPractice(context.Item))" Target="_blank">开始考前练习</MudButton>
+                                </MudTooltip>
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Title="状态" Property="x => x.AssessmentResult!.Status" />
-                        <PropertyColumn Title="用时（分钟）" Property="x => x.AssessmentResult!.Duration" />
-                        <PropertyColumn Title="分数" Property="x => x.AssessmentResult!.Score" />
                     </Columns>
                 </MudDataGrid>
             </MudStep>
@@ -87,7 +87,7 @@
                             <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
                                           AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" ReadOnly /><br /><br />
                             <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "off" } })"
-                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true" 
+                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true"
                                           AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
                             <MudPaper Class="pa-4 mt-4" Elevation="0">
                                 <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
@@ -358,6 +358,19 @@
     //     _selectedAssessment = selectedAssessment;
     //     await _tabs.ActivatePanelAsync(2);
     // }
+
+    Task StartPractice(WordsAssessmentModel assessmentModel)
+    {
+        var parameters = new DialogParameters<WordsAssessmentPracticeComponent>
+        {
+            { x => x.CurrentUserId, _currentUserId },
+            { x => x.Assessment, assessmentModel }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraLarge };
+
+        return DialogService.ShowAsync<WordsAssessmentPracticeComponent>("考前练习", parameters, options);
+    }
 
 
 }

@@ -1,0 +1,103 @@
+﻿@using Umbra.School.Models.Assessment
+@inject IAssessmentService AssessmentService
+
+<MudCard>
+    <MudCardHeader>
+        <CardHeaderContent>
+            @if (Assessment != null)
+            {
+                <MudText Typo="Typo.h6">@Assessment.AssessmentInfoName</MudText>
+            }
+            else
+            {
+                <MudText Typo="Typo.h6">必须选择一个测试。</MudText>
+            }
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton StartIcon="@Icons.Material.Filled.FactCheck" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Secondary" OnClick="CheckAllAnswers">验证对错</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.LockReset" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Default" Class="mx-10" OnClick="ResetAll">重置</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+</MudCard>
+
+<MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+             ReadOnly="true" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(Assessment==null?"d-none":"pa-5")">
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">没有答题记录。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
+        <TemplateColumn Title="你的答案">
+            <CellTemplate>
+                <MudStaticTextField @bind-Value="@context.Item.Answer"></MudStaticTextField>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="正确答案">
+            <CellTemplate>
+                @if (_hideCorrect)
+                {
+                    <MudTooltip Text="@context.Item.Word" Placement="Placement.Right" Arrow="true">
+                        <MudIconButton Icon="@Icons.Material.Filled.VisibilityOff" Size=" MudBlazor.Size.Small"></MudIconButton>
+                    </MudTooltip>
+                }
+                else
+                {
+                    <MudText>@context.Item.Word</MudText>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn>
+            <CellTemplate>
+                @if (!_hideCorrect)
+                {
+                    if (context.Item.Word == context.Item.Answer)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="MudBlazor.Color.Success" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Close" Color="MudBlazor.Color.Error" />
+                    }
+                }
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    [Parameter]
+    public string CurrentUserId { get; set; } = string.Empty;
+    [Parameter]
+    public WordsAssessmentModel? Assessment { get; set; }
+
+    MudDataGrid<WordsAssessmentDetailModel>? _reviewDataGrid;
+    List<WordsAssessmentDetailModel> _assessmentDetails = new List<WordsAssessmentDetailModel>();
+
+    bool _hideCorrect = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (Assessment != null)
+            await LoadWordsAssessmentDetails();
+    }
+
+    async Task LoadWordsAssessmentDetails()
+    {
+        var result = await AssessmentService.GetWordsAssessmentDetails(CurrentUserId, Assessment.AssessmentInfoId);
+        if (result != null && result.Success && result.Data != null)
+        {
+            _assessmentDetails = result.Data;
+        }
+    }
+
+    void CheckAllAnswers()
+    {
+        _hideCorrect = false;
+    }
+
+    void ResetAll()
+    {
+        _hideCorrect = true;
+    }
+}

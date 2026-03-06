@@ -41,6 +41,14 @@
             <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard">后台管理面板</MudNavLink>
         </Authorized>
     </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <MudNavGroup Title="我的账户" Expanded="@IsExpanded("/account/manage")" Icon="@Icons.Material.Filled.Person2">
+                <MudNavLink Href="/account/manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DocumentScanner" title="我的资料">我的资料</MudNavLink>
+                <MudNavLink Href="/account/manage/changepassword" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Password" title="修改密码">修改密码</MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
     <MudNavLink Href="/about" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Info">关于</MudNavLink>
     <MudNavLink Href="counter" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Add" Class="d-none">Counter</MudNavLink>
     <MudNavLink Href="weather" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List" Class="d-none">Weather</MudNavLink>

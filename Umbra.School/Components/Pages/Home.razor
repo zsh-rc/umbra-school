@@ -9,6 +9,15 @@
 
 <MudContainer Class="mt-8 px-8 mud-full-height" MaxWidth="MaxWidth.False">
     <MudGrid>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h4" Class="mb-4">欢迎来到 Umbra 学习平台！</MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudText Typo="Typo.h6" Class="mb-4" Color=" MudBlazor.Color.Secondary">
+                <MudIcon Icon="@Icons.Material.Filled.Warning" Size="MudBlazor.Size.Small" />
+                3/6：增加新功能：<u><a href="/assessment/english/words">考前练习</a></u>、<u><a href="/account/manage">修改个人资料</a></u>和<u><a href="/account/manage/changepassword">修改密码</a></u>。
+            </MudText>
+        </MudItem>
         <MudItem xs="12" sm="6" md="4">
             <MudPaper Elevation="2" Class="pa-4">
                 <ApexChart TItem="ReportEnWordsCountModel"
@@ -44,7 +53,7 @@
                                      Name="分数"
                                      SeriesType="SeriesType.Line"
                                      XValue="@(e => e.AssessmentInfoName)"
-                                     YValue="@(e => e.Score)" 
+                                     YValue="@(e => e.Score)"
                                      ShowDataLabels="true" />
                 </ApexChart>
             </MudPaper>

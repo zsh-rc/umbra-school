@@ -43,6 +43,17 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = true;
         options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+
+        // Zach 6-Mar-26: Password Complexity Settings
+        // 1. 长度限制：设置为更短的位数（默认 6）
+        options.Password.RequiredLength = 6;
+        // 2. 复杂度开关：全部设为 false 即可取消强制要求
+        options.Password.RequireDigit = true;            // 是否需要数字
+        options.Password.RequireLowercase = true;        // 是否需要小写字母
+        options.Password.RequireUppercase = true;        // 是否需要大写字母
+        options.Password.RequireNonAlphanumeric = false;  // 是否需要特殊字符 (@, #, $ 等)
+        // 3. 唯一字符要求：设置为 1 表示不要求字符必须互不相同（默认 1）
+        options.Password.RequiredUniqueChars = 1;
     })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

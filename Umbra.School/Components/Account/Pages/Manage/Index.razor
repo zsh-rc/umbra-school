@@ -9,9 +9,9 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>个人资料</PageTitle>
 
-<MudText Typo="Typo.h6" GutterBottom="true">Profile</MudText>
+<MudText Typo="Typo.h6" GutterBottom="true">个人资料</MudText>
 
 <StatusMessage />
 
@@ -20,23 +20,35 @@
 
     <MudGrid>
         <MudItem md="12">
-            <MudStaticTextField Value="@username" Label="Username" Disabled="true" Placeholder="Please choose your username." />
+            <MudStaticTextField Value="@_username" Label="用户名" Disabled="true" Placeholder="请输入您的用户名。" />
         </MudItem>
         <MudItem md="12">
             <MudStaticTextField For="@(() => Input.PhoneNumber)" @bind-Value="Input.PhoneNumber"
-                                Label="Phone Number" HelperText="Please enter your phone number."
-                                UserAttributes="@(new() { { "autocomplete", "tel-national" } } )" />
+                                Label="电话号码" HelperText="请输入您的联系电话。"
+                                UserAttributes="@(new() { { "autocomplete", "tel-national" } })" />
         </MudItem>
         <MudItem md="12">
-            <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" FormAction="FormAction.Submit">Save</MudStaticButton>
+            <MudStaticTextField For="@(() => Input.LastName)" @bind-Value="Input.LastName"
+                                Label="姓" HelperText="请输入您的姓。" 
+                                UserAttributes="@(new() { { "autocomplete", "off" } })" />
+        </MudItem>
+        <MudItem md="12">
+            <MudStaticTextField For="@(() => Input.FirstName)" @bind-Value="Input.FirstName"
+                                Label="名" HelperText="请输入您的名。" 
+                                UserAttributes="@(new() { { "autocomplete", "off" } })" />
+        </MudItem>
+        <MudItem md="12">
+            <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" FormAction="FormAction.Submit">保存</MudStaticButton>
         </MudItem>
     </MudGrid>
 </EditForm>
 
 @code {
-    private ApplicationUser user = default!;
-    private string? username;
-    private string? phoneNumber;
+    private ApplicationUser _user = default!;
+    private string? _username;
+    private string? _phoneNumber;
+    private string? _firstName;
+    private string? _lastName;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -46,32 +58,60 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        username = await UserManager.GetUserNameAsync(user);
-        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+        _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        _username = await UserManager.GetUserNameAsync(_user);
+        _phoneNumber = await UserManager.GetPhoneNumberAsync(_user);
+        _lastName = _user.LastName;
+        _firstName = _user.FirstName;
 
-        Input.PhoneNumber ??= phoneNumber;
+        Input.PhoneNumber ??= _phoneNumber;
+        Input.LastName ??= _lastName;
+        Input.FirstName ??= _firstName;
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
+        if (Input.PhoneNumber != _phoneNumber)
         {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+            var setPhoneResult = await UserManager.SetPhoneNumberAsync(_user, Input.PhoneNumber);
             if (!setPhoneResult.Succeeded)
             {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
+                RedirectManager.RedirectToCurrentPageWithStatus("错误：修改电话号码失败。", HttpContext);
             }
         }
 
-        await SignInManager.RefreshSignInAsync(user);
-        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+        if (Input.LastName != _lastName)
+        {
+            _user.LastName = Input.LastName;
+            var updateLastNameResult = await UserManager.UpdateAsync(_user);
+            if (!updateLastNameResult.Succeeded)
+            {
+                RedirectManager.RedirectToCurrentPageWithStatus("错误：修改姓失败。", HttpContext);
+            }
+        }
+
+        if (Input.FirstName != _firstName)
+        {
+            _user.FirstName = Input.FirstName;
+            var updateLastNameResult = await UserManager.UpdateAsync(_user);
+            if (!updateLastNameResult.Succeeded)
+            {
+                RedirectManager.RedirectToCurrentPageWithStatus("错误：修改名失败。", HttpContext);
+            }
+        }
+
+        await SignInManager.RefreshSignInAsync(_user);
+        RedirectManager.RedirectToCurrentPageWithStatus("个人资料保存成功。", HttpContext);
     }
 
     private sealed class InputModel
     {
         [Phone]
-        [Display(Name = "Phone number")]
+        [Display(Name = "电话号码")]
         public string? PhoneNumber { get; set; }
+        [Display(Name = "名")]
+        public string? FirstName { get; set; }
+        [Display(Name = "姓")]
+        public string? LastName { get; set; }
     }
 }
