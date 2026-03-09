@@ -9,12 +9,13 @@
     }
 </style>
 
-<MudNavMenu Rounded="true" Bordered="true" Margin="Margin.Normal">
+<MudNavMenu Rounded="true" Bordered="true" Margin="Margin.Normal" Dense>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">主页</MudNavLink>
     <AuthorizeView>
         <Authorized>
             <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english")" Icon="@Icons.Material.Filled.Book">
-                <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>                
+                <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
+                <MudNavLink Href="/english/words/shsp/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsp") ? "active" : "")" Icon="@Icons.Material.Filled.ShortText" title="高中词组">高中词组</MudNavLink>
                 <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shpsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="小学词汇">小学词汇</MudNavLink>
                 <MudNavLink Href="/english/words/shjhsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shjhsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="初中词汇">初中词汇</MudNavLink>
                 <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" Class="d-none">高中词组</MudNavLink>
@@ -39,7 +40,10 @@
                 <MudNavGroup Title="英语词汇专项测试" Expanded="false" Icon="@Icons.Material.Filled.Book" Class="d-none">
                 </MudNavGroup>
             </MudNavGroup>
-            <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard" Target="_blank">后台管理面板</MudNavLink>
+            <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin")" Icon="@Icons.Material.Filled.Settings">
+                <MudNavLink Href="/admin/userroles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="Job Dashboard" Target="_blank">用户角色管理</MudNavLink>
+            </MudNavGroup>
+            <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard" Target="_blank">后台管理面板 ↗</MudNavLink>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView>

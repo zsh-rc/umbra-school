@@ -10,13 +10,13 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register confirmation</PageTitle>
+<PageTitle>账号注册完毕</PageTitle>
 
-<h1>Register confirmation</h1>
+<h1>您的账号需要确认，请联系系统管理员。</h1>
 
 <StatusMessage Message="@statusMessage" />
 
-@if (emailConfirmationLink is not null)
+@* @if (emailConfirmationLink is not null)
 {
     <p>
         This app does not currently have a real email sender registered, see <a class="mud-link mud-primary-text mud-link-underline-hover" href="https://aka.ms/aspaccountconf">these docs</a> for how to configure a real email sender.
@@ -26,7 +26,7 @@
 else
 {
     <p role="alert">Please check your email to confirm your account.</p>
-}
+} *@
 
 @code {
     private string? emailConfirmationLink;
