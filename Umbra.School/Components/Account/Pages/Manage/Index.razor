@@ -29,12 +29,17 @@
         </MudItem>
         <MudItem md="12">
             <MudStaticTextField For="@(() => Input.LastName)" @bind-Value="Input.LastName"
-                                Label="姓" HelperText="请输入您的姓。" 
+                                Label="姓" HelperText="请输入您的姓。"
                                 UserAttributes="@(new() { { "autocomplete", "off" } })" />
         </MudItem>
         <MudItem md="12">
             <MudStaticTextField For="@(() => Input.FirstName)" @bind-Value="Input.FirstName"
-                                Label="名" HelperText="请输入您的名。" 
+                                Label="名" HelperText="请输入您的名。"
+                                UserAttributes="@(new() { { "autocomplete", "off" } })" />
+        </MudItem>
+        <MudItem md="12">
+            <MudStaticTextField For="@(() => Input.FullName)" @bind-Value="Input.FullName"
+                                Label="全名" ReadOnly
                                 UserAttributes="@(new() { { "autocomplete", "off" } })" />
         </MudItem>
         <MudItem md="12">
@@ -49,6 +54,7 @@
     private string? _phoneNumber;
     private string? _firstName;
     private string? _lastName;
+    private string? _fullName;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -63,10 +69,12 @@
         _phoneNumber = await UserManager.GetPhoneNumberAsync(_user);
         _lastName = _user.LastName;
         _firstName = _user.FirstName;
+        _fullName = _user.FullName;
 
         Input.PhoneNumber ??= _phoneNumber;
         Input.LastName ??= _lastName;
         Input.FirstName ??= _firstName;
+        Input.FullName = GetFullName();
     }
 
     private async Task OnValidSubmitAsync()
@@ -99,9 +107,30 @@
                 RedirectManager.RedirectToCurrentPageWithStatus("错误：修改名失败。", HttpContext);
             }
         }
+        if (Input.FullName != _fullName)
+        {
+            _user.FullName = Input.FullName;
+            var updateLastNameResult = await UserManager.UpdateAsync(_user);
+            if (!updateLastNameResult.Succeeded)
+            {
+                RedirectManager.RedirectToCurrentPageWithStatus("错误：修改全名失败。", HttpContext);
+            }
+        }
 
         await SignInManager.RefreshSignInAsync(_user);
         RedirectManager.RedirectToCurrentPageWithStatus("个人资料保存成功。", HttpContext);
+    }
+
+    private string? GetFullName()
+    {
+        if (string.IsNullOrWhiteSpace(Input.FirstName) && string.IsNullOrWhiteSpace(Input.LastName))
+            return null;
+        // Logic: If either name contains Chinese characters, use Chinese format
+        if (UtilityHelper.ContainsChinese(Input.FirstName!) || UtilityHelper.ContainsChinese(Input.LastName!))
+        {
+            return $"{Input.LastName}{Input.FirstName}"; // No space for Chinese names
+        }
+        return $"{Input.FirstName} {Input.LastName}"; // Space for English names
     }
 
     private sealed class InputModel
@@ -113,5 +142,7 @@
         public string? FirstName { get; set; }
         [Display(Name = "姓")]
         public string? LastName { get; set; }
+        [Display(Name = "全名")]
+        public string? FullName { get; set; }
     }
 }

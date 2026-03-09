@@ -14,8 +14,8 @@
             }
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudButton StartIcon="@Icons.Material.Filled.FactCheck" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Secondary" OnClick="CheckAllAnswers">验证对错</MudButton>
-            <MudButton StartIcon="@Icons.Material.Filled.LockReset" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Default" Class="mx-10" OnClick="ResetAll">重置</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.LockReset" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Dark" Class="mx-10" OnClick="ResetAll">隐藏单词进行模拟测试</MudButton>
+            <MudButton StartIcon="@Icons.Material.Filled.FactCheck" Variant="Variant.Filled" Size="MudBlazor.Size.Small" Color=" MudBlazor.Color.Secondary" OnClick="CheckAllAnswers" Class="mr-10">校对答案</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
 </MudCard>
@@ -26,13 +26,7 @@
         <MudText Typo="Typo.body1">没有答题记录。</MudText>
     </NoRecordsContent>
     <Columns>
-        <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
-        <TemplateColumn Title="你的答案">
-            <CellTemplate>
-                <MudStaticTextField @bind-Value="@context.Item.Answer"></MudStaticTextField>
-            </CellTemplate>
-        </TemplateColumn>
-        <TemplateColumn Title="正确答案">
+        <TemplateColumn Title="英文">
             <CellTemplate>
                 @if (_hideCorrect)
                 {
@@ -42,15 +36,27 @@
                 }
                 else
                 {
-                    <MudText>@context.Item.Word</MudText>
+                    <MudText>
+                        <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>
+                        &nbsp;
+                        <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>
+                        &nbsp;
+                    </MudText>
                 }
             </CellTemplate>
         </TemplateColumn>
+        <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
+        <TemplateColumn Title="你的答案">
+            <CellTemplate>
+                <MudStaticTextField @bind-Value="@context.Item.Answer"></MudStaticTextField>
+            </CellTemplate>
+        </TemplateColumn>
+
         <TemplateColumn>
             <CellTemplate>
                 @if (!_hideCorrect)
                 {
-                    if (context.Item.Word == context.Item.Answer)
+                    if (context.Item.Word.Equals(context.Item.Answer, StringComparison.OrdinalIgnoreCase))
                     {
                         <MudIcon Icon="@Icons.Material.Filled.Check" Color="MudBlazor.Color.Success" />
                     }
@@ -64,6 +70,15 @@
     </Columns>
 </MudDataGrid>
 
+<script>
+    function playVoice(word) {
+        const url = "https://dict.youdao.com/dictvoice?audio="+word+"&type=2";
+        const audio = new Audio(url);
+        audio.play();
+    }
+</script>
+
+
 @code {
     [Parameter]
     public string CurrentUserId { get; set; } = string.Empty;
@@ -73,7 +88,7 @@
     MudDataGrid<WordsAssessmentDetailModel>? _reviewDataGrid;
     List<WordsAssessmentDetailModel> _assessmentDetails = new List<WordsAssessmentDetailModel>();
 
-    bool _hideCorrect = true;
+    bool _hideCorrect = false;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -84,7 +99,7 @@
 
     async Task LoadWordsAssessmentDetails()
     {
-        var result = await AssessmentService.GetWordsAssessmentDetails(CurrentUserId, Assessment.AssessmentInfoId);
+        var result = await AssessmentService.GetWordsAssessmentDetails(CurrentUserId, Assessment!.AssessmentInfoId);
         if (result != null && result.Success && result.Data != null)
         {
             _assessmentDetails = result.Data;

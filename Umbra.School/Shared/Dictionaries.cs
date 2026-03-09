@@ -6,6 +6,7 @@
         {
             { "shsv", "上海高中词汇" },
             { "shpsv", "上海小学词汇" },
+            { "shjhsv", "上海初中词汇" },
             { "myu", "我的生词库" },
         };
         public static Dictionary<string, string> WordsAssessmentSources = new Dictionary<string, string>

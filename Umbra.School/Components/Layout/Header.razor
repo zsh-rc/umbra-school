@@ -28,7 +28,7 @@
             <MudTextField T="string" Label="Search" Clearable="true" Underline="false"
                           Variant="Variant.Filled" style="border-radius: 30px; "
                           Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" AdornmentColor="MudBlazor.Color.Secondary"></MudTextField>
-            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" />
+            <MudIconButton Icon="@Icons.Material.Outlined.Notifications" Color="MudBlazor.Color.Primary" />
             <MudMenu>
                 <ActivatorContent Context="acContext">
                     <MudAvatar Color="MudBlazor.Color.Primary">
@@ -44,23 +44,23 @@
             <form action="Account/Logout" method="post">
                 <AntiforgeryToken />
                 <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                <MudIconButton Icon="@Icons.Material.Filled.Logout" ButtonType="ButtonType.Submit"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Logout" ButtonType="ButtonType.Submit" Color="MudBlazor.Color.Primary"></MudIconButton>
             </form>
         </Authorized>
         <NotAuthorized>
             @if (RendererInfo.IsInteractive)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Login" OnClick="Login"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Color="MudBlazor.Color.Primary" OnClick="Login"></MudIconButton>
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Login" Href="/account/login"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Color="MudBlazor.Color.Primary" Href="/account/login"></MudIconButton>
             }
         </NotAuthorized>
     </AuthorizeView>
     @if (RendererInfo.IsInteractive)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.Brightness4"
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="MudBlazor.Color.Primary"
                        OnClick="LayoutStateService.ToggleTheme" />
         <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="MudBlazor.Color.Inherit" />
     }
@@ -81,9 +81,8 @@
     {
         var user = await UserProvider.GetUserAsync();
         var username = user.Username;
-        var firstName = user.FirstName;
-        var lastName = user.LastName;
-        if (string.IsNullOrWhiteSpace(firstName) && string.IsNullOrWhiteSpace(lastName))
+        var fullName = user.FullName;
+        if (string.IsNullOrWhiteSpace(fullName))
         {
             _currentDisplayName = username;
             if (!string.IsNullOrEmpty(_currentDisplayName))
@@ -93,7 +92,7 @@
         }
         else
         {
-            _currentDisplayName = user.FullName;
+            _currentDisplayName = fullName;
             if (!string.IsNullOrEmpty(_currentDisplayName))
             {
                 _currentDisplayAvatar = _currentDisplayName.Substring(_currentDisplayName.Length - 1, 1).ToUpper();

@@ -2,13 +2,13 @@
 @inject LayoutStateService LayoutStateService
 @inject AuthenticationStateProvider AuthStateProvider
 
-<MudThemeProvider Theme="_theme" IsDarkMode="@LayoutStateService.DarkMode" />
+<MudThemeProvider Theme="MudThemes.Silvertheme" IsDarkMode="@LayoutStateService.DarkMode" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <MudAppBar Elevation="0" Dense="false" Class="rounded-t-xl">
+    <MudAppBar Elevation="2" Dense="false" Class="rounded-t-xl">
         <Header />
     </MudAppBar>
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Elevation="0" Color="MudBlazor.Color.Transparent">
@@ -66,6 +66,7 @@
         },
 
     };
+
 
     protected override async Task OnInitializedAsync()
     {

@@ -14,7 +14,7 @@
 </MudPaper>
 
 <MudGrid Justify="Justify.FlexStart">
-    <MudItem xs="5">
+    <MudItem xs="4">
         <MudCard>
             <MudCardHeader>
                 <MudText Typo="Typo.subtitle1">测试记录列表</MudText>
@@ -30,14 +30,22 @@
                     </GroupTemplate>
                     <Columns>
                         <SelectColumn ShowInHeader="false"></SelectColumn>
-                        <PropertyColumn Title="测试计划" Property="x => x.AssessementInfo.Name" Groupable="true" Grouping Hidden />
-                        <TemplateColumn Title="答题人员">
+                        <PropertyColumn Title="答题人员" Property="x => x.ApplicationUser.FullName" Groupable="true" Grouping Hidden />
+                        <PropertyColumn Title="测试计划" Property="x => x.AssessementInfo.Name" />
+                        <TemplateColumn Title="状态">
                             <CellTemplate>
-                                <MudLink>@context.Item.ApplicationUser.UserName</MudLink>
+                                @if (context.Item.Status == AssessmentStatus.Reviewed.GetDescription())
+                                {
+                                    <MudText>@($"{context.Item.Status} ({context.Item.Score})")</MudText>
+                                }
+                                else
+                                {
+                                    <MudText Color="MudBlazor.Color.Warning">@($"{context.Item.Status}")</MudText>
+                                }
                             </CellTemplate>
                         </TemplateColumn>
-                        <PropertyColumn Title="状态" Property="x => x.Status" />
-                        <PropertyColumn Title="分数" Property="x => x.Score" />
+                        <PropertyColumn Title="状态" Property="x => x.Status">
+                        </PropertyColumn>
                     </Columns>
                 </MudDataGrid>
             </MudCardContent>
@@ -59,6 +67,10 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudForm Model="_selectedAssessmentResult">
+                    @if (_selectedAssessmentResult.Duration != null)
+                    {
+                        <MudField Label="时间和用时">@($"{_selectedAssessmentResult.Date.ToShortDateString()} {_selectedAssessmentResult.StartTime!.Value.ToString("h:m:s")} - {_selectedAssessmentResult.EndTime!.Value.ToString("h:m:s")} 用时{_selectedAssessmentResult.Duration}分钟")</MudField>
+                    }
                     <MudTextField Label="最终分数" AdornmentIcon="@Icons.Material.Filled.Score" Adornment="Adornment.Start" Immediate="true"
                                   @bind-Value="_selectedAssessmentResult.Score" For="@(() => _selectedAssessmentResult.Score)"></MudTextField>
                     <MudTextField Label="审批意见及反馈" Lines="2" Placeholder="请在此输入此次答题情况的反馈。"
@@ -73,8 +85,7 @@
                         </NoRecordsContent>
                         <Columns>
                             <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
-                            <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
-                            <TemplateColumn>
+                            <TemplateColumn Title="提供的答案">
                                 <CellTemplate>
                                     @if (context.Item.Correct.HasValue && context.Item.Correct.Value)
                                     {

@@ -38,10 +38,10 @@
                     foreach (var letter in alphabets)
                     {
                         <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/unfamiliar/{letter.ToString().ToLower()}")"
-                                 Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                                 Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Small">@letter</MudChip>
                     }
                     <MudChip T="string" Variant="@("all" == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/unfamiliar/all")"
-                             Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">All</MudChip>
+                             Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Small">All</MudChip>
                 }
             }
             <MudSpacer />

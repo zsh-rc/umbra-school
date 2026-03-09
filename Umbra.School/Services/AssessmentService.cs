@@ -509,7 +509,7 @@ namespace Umbra.School.Services
                 return failed;
             }
 
-            var assessmentInfoId = answers.First().WordsAssessment.AssessmentInfoId;
+            var assessmentInfoId = (await _context.WordsAssessments.FirstAsync(wa=>wa.Id == answers.First().WordsAssessementId)).AssessmentInfoId;
             var userId = answers.First().UserId;
 
             try

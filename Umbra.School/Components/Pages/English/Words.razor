@@ -39,7 +39,7 @@
                     foreach (var letter in alphabets)
                     {
                         <MudChip T="string" Variant="@(letter.ToString().ToLower() == alphabet?.ToLower() ? Variant.Filled : Variant.Text)" Href="@($"/english/words/{book}/{letter.ToString().ToLower()}")"
-                                 Color="MudBlazor.Color.Secondary" Size="MudBlazor.Size.Small">@letter</MudChip>
+                                 Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Small">@letter</MudChip>
                     }
                 }
             }

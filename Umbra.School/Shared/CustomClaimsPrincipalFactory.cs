@@ -26,6 +26,7 @@ namespace Umbra.School.Shared
                 new Claim("CustomUserId", user.Id),
                 new Claim("FirstName", !string.IsNullOrEmpty(user.FirstName)?user.FirstName : ""),
                 new Claim("LastName", !string.IsNullOrEmpty(user.LastName)?user.LastName : ""),
+                new Claim("FullName", !string.IsNullOrEmpty(user.FullName)?user.FullName : ""),
             });
 
             return principal;

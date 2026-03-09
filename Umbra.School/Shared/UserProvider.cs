@@ -28,6 +28,7 @@ namespace Umbra.School.Shared
                 IsAdmin = user.IsInRole("Admin"),
                 FirstName = user.FindFirst("FirstName")?.Value ?? "",
                 LastName = user.FindFirst("LastName")?.Value ?? "",
+                FullName = user.FindFirst("FullName")?.Value ?? "",
             };
         }
     }
