@@ -1,4 +1,132 @@
 ﻿body {
     height: 100%;
-    margin: 0;
+    margin: 0px;
+    padding: 0px;
 }
+
+.home-layout {
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url(images/background.jpg);
+    height: 100vh;
+    background-size: cover;
+    background-position: center;
+    min-height: 100px;
+    z-index: 0;
+}
+
+.main-content {
+    /*    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;*/
+}
+
+.bg-transparent {
+    background: none !important;
+    background-color: transparent !important;
+}
+
+.login-register-container {
+    background: none;
+    max-width: 80em;
+    margin: 0 auto;
+    border-radius: 30px !important;
+    padding: 40px 30px;
+    /*box-shadow: 20px 20px 60px #C0D25B, -20px -20px 60px #5d6368 !important;*/
+    /*box-shadow: 20px 20px 60px #bec3cf, -20px -20px 60px #5d6368 !important;*/
+    /*transition: all 0.3s ease !important;*/
+}
+
+.login-register-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 0px;
+}
+
+    .login-register-gallery .photo {
+        --s: 10px; /* control the size of the wave */
+        --w: 200px; /* preferred image width */
+        transform: rotate(5deg);
+        width: round(var(--w),4*var(--s));
+        aspect-ratio: 1;
+        padding: calc(3.5*var(--s));
+        box-sizing: border-box;
+        background: linear-gradient(#4ECDC4,#556270);
+        border-radius: calc(4*var(--s));
+        --_g: conic-gradient(#000 0 0) no-repeat 50%/;
+        mask: radial-gradient(var(--s),#000 100%,#0000 calc(100% + 1px)) 0 0/calc(4*var(--s)) calc(4*var(--s)), var(--_g) calc(100% - 6*var(--s)) calc(100% - 6*var(--s)), var(--_g) calc(100% - 4*var(--s)) calc(100% - 4*var(--s)) intersect, radial-gradient(var(--s),#0000 calc(100% - 1px),#000) var(--s) var(--s)/calc(2*var(--s)) calc(2*var(--s));
+    }
+
+    /* Apply random rotation to every 2nd and 3rd item */
+
+        .login-register-gallery .photo:nth-child(2n) {
+            background: linear-gradient(45deg,#F8CA00,#FF6B6B);
+            transform: rotate(-10deg);
+        }
+
+        .login-register-gallery .photo:nth-child(3n) {
+            background: linear-gradient(45deg, #556270,#F8CA00);
+            transform: rotate(-3deg);
+            margin-top: 30px;
+        }
+
+        .login-register-gallery .photo:nth-child(4n) {
+            background: linear-gradient(45deg,#F8CA00,#FF6B6B);
+            transform: rotate(20deg);
+            margin-left: 20px;
+        }
+
+.login-register-card {
+    background-color: #E4E6A3;
+    opacity: revert-layer;
+    max-width: 60em;
+    margin: 0 auto;
+    border-radius: 30px !important;
+    padding: 15px 20px;
+    box-shadow: 20px 20px 60px #C0D25B, -20px -20px 60px #000f !important;
+    /*box-shadow: 20px 20px 60px #bec3cf, -20px -20px 60px #5d6368 !important;*/
+    transition: all 0.3s ease !important;
+}
+
+    .login-register-card:hover {
+        transform: translateY(-5px);
+    }
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-register-card button {
+    padding: 16px;
+    border-radius: 20px !important;
+}
+
+
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+    .divider .divider-line {
+        flex: 1;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #bec3cf, transparent);
+    }
+
+.social-login {
+    display: flex;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+    .social-login .mud-button-filled-size-large.mud-icon-button {
+        border-radius: 50%;
+        padding: 10px;
+    }

@@ -12,32 +12,40 @@
         <MudItem xs="12">
             <MudText Typo="Typo.h4" Class="mb-4">欢迎来到 Umbra 学习平台！</MudText>
         </MudItem>
-        <MudItem xs="12">
-            <MudText Typo="Typo.h6" Class="mb-4" Color=" MudBlazor.Color.Secondary">
-                <MudIcon Icon="@Icons.Material.Filled.Warning" Size="MudBlazor.Size.Small" />
-                3/6：增加新功能：<u><a href="/assessment/english/words">考前练习</a></u>、<u><a href="/account/manage">修改个人资料</a></u>和<u><a href="/account/manage/changepassword">修改密码</a></u>。
-            </MudText>
-        </MudItem>
         <MudItem xs="12" sm="6" md="4">
-            <MudPaper Elevation="2" Class="pa-4">
-                <ApexChart TItem="ReportEnWordsCountModel"
-                           Title="词汇库" Options="_englishWordsCountSeriesBarChartOptions">
-                    <ApexPointSeries TItem="ReportEnWordsCountModel"
-                                     Items="_englishWordsCount"
-                                     Name="词汇数量"
-                                     XValue="@(e => Dictionaries.WordsAssessmentScopes[e.Book])"
-                                     YAggregate="@(e => e.Sum(e => e.WordsCount))"
-                                     OrderByDescending="e=>e.Y"
-                                     SeriesType="SeriesType.Bar"
-                                     PointColor="e=> HighlightUnfamiliarColor(e)"
-                                     ShowDataLabels="true" />
-                </ApexChart>
-            </MudPaper>
+            <MudField Variant="Variant.Outlined" Label="我的测试计划">
+                <MudBadge Content="@_total" Color="MudBlazor.Color.Dark" Overlap="true" Bordered="true" Class="mx-6 my-2">
+                    <MudButton Color="MudBlazor.Color.Dark" Variant="Variant.Filled" DropShadow="false">总计</MudButton>
+                </MudBadge>
+                <MudBadge Content="@_notStarted" Color="MudBlazor.Color.Error" Overlap="true" Bordered="true" Class="mx-3 my-2">
+                    <MudButton Color="MudBlazor.Color.Error" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.NotStarted.GetDescription()</MudButton>
+                </MudBadge>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
+                <MudBadge Content="@_inProgress" Color="MudBlazor.Color.Warning" Overlap="true" Bordered="true" Class="mx-3 my-2">
+                    <MudButton Color="MudBlazor.Color.Warning" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.InProgress.GetDescription()</MudButton>
+                </MudBadge>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
+                <MudBadge Content="@_submitted" Color="MudBlazor.Color.Secondary" Overlap="true" Bordered="true" Class="mx-3 my-2">
+                    <MudButton Color="MudBlazor.Color.Secondary" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.Submitted.GetDescription()</MudButton>
+                </MudBadge>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
+                <MudBadge Content="@_reviewed" Color="MudBlazor.Color.Success" Overlap="true" Bordered="true" Class="mx-3 my-2">
+                    <MudButton Color="MudBlazor.Color.Success" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.Reviewed.GetDescription()</MudButton>
+                </MudBadge>
+            </MudField>
+            @* <MudGrid>
+                <MudItem><MudTextField T="int" Variant="Variant.Outlined" Label="总计" @bind-Value="@_total" ReadOnly></MudTextField></MudItem>
+                <MudItem><MudTextField T="int" Variant="Variant.Outlined" Label="@AssessmentStatus.NotStarted.GetDescription()" @bind-Value="@_notStarted" ReadOnly></MudTextField></MudItem>
+                <MudItem><MudTextField T="int" Variant="Variant.Outlined" Label="@AssessmentStatus.InProgress.GetDescription()" @bind-Value="@_inProgress" ReadOnly></MudTextField></MudItem>
+                <MudItem><MudTextField T="int" Variant="Variant.Outlined" Label="@AssessmentStatus.Submitted.GetDescription()" @bind-Value="@_submitted" ReadOnly></MudTextField></MudItem>
+                <MudItem><MudTextField T="int" Variant="Variant.Outlined" Label="@AssessmentStatus.Reviewed.GetDescription()" @bind-Value="@_reviewed" ReadOnly></MudTextField></MudItem>
+            </MudGrid> *@
         </MudItem>
+        <MudFlexBreak />
         <MudItem xs="12" sm="6" md="8">
             <MudPaper Elevation="2" Class="pa-4">
                 <ApexChart TItem="ReportUserAssessmentModel"
-                           Title="我的测试统计"
+                           Title="测试结果统计"
                            Options="_assessmentMixedChartOptions">
 
                     <ApexPointSeries TItem="ReportUserAssessmentModel"
@@ -54,6 +62,22 @@
                                      SeriesType="SeriesType.Line"
                                      XValue="@(e => e.AssessmentInfoName)"
                                      YValue="@(e => e.Score)"
+                                     ShowDataLabels="true" />
+                </ApexChart>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudPaper Elevation="2" Class="pa-4">
+                <ApexChart TItem="ReportEnWordsCountModel"
+                           Title="词汇库" Options="_englishWordsCountSeriesBarChartOptions">
+                    <ApexPointSeries TItem="ReportEnWordsCountModel"
+                                     Items="_englishWordsCount"
+                                     Name="词汇数量"
+                                     XValue="@(e => Dictionaries.WordsAssessmentScopes[e.Book])"
+                                     YAggregate="@(e => e.Sum(e => e.WordsCount))"
+                                     OrderByDescending="e=>e.Y"
+                                     SeriesType="SeriesType.Bar"
+                                     PointColor="e=> HighlightUnfamiliarColor(e)"
                                      ShowDataLabels="true" />
                 </ApexChart>
             </MudPaper>
@@ -102,6 +126,8 @@
 
     List<ReportUserAssessmentModel> _myAssessmentResults = new List<ReportUserAssessmentModel>();
     ApexChartOptions<ReportUserAssessmentModel> _assessmentMixedChartOptions = new();
+
+    int _total, _notStarted, _inProgress, _submitted, _reviewed;
 
     protected override async Task OnInitializedAsync()
     {
@@ -211,6 +237,15 @@
     {
         _englishWordsCount = await DashboardService.GetReportEnWordsCounts(_currentUserId);
         _myAssessmentResults = await DashboardService.GetReportUserAssessments(_currentUserId);
+        var status = await DashboardService.GetReportUserAssessmentStatuses(_currentUserId);
+        if (status != null)
+        {
+            _total = status.Total;
+            _notStarted = status.NotStarted;
+            _inProgress = status.InProgress;
+            _submitted = status.Submitted;
+            _reviewed = status.Reviewed;
+        }
     }
 
 }

@@ -67,6 +67,8 @@ namespace Umbra.School.Shared
             CreateProjection<ReportEnWordsCount, ReportEnWordsCountModel>();
             CreateMap<ReportUserAssessment, ReportUserAssessmentModel>().ReverseMap();
             CreateProjection<ReportUserAssessment, ReportUserAssessmentModel>();
+            CreateMap<ReportUserAssessmentStatus, ReportUserAssessmentStatusModel>().ReverseMap();
+            CreateProjection<ReportUserAssessmentStatus, ReportUserAssessmentStatusModel>();
             #endregion
         }
     }

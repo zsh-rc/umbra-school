@@ -1,0 +1,21 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider Theme="MudThemes.Silvertheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout Class="home-layout">    
+    <MudAppBar Elevation="0" Dense="false" Class="rounded-t-xl" Style="background:none;">
+        <Header />
+    </MudAppBar>
+    <MudMainContent Class="main-content">
+        <MudPaper Class="bg-transparent" Elevation="0">
+            @Body
+        </MudPaper>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+
+}

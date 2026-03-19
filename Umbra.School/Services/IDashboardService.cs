@@ -9,5 +9,6 @@ namespace Umbra.School.Services
         Task DashboardDataStatistics();
         Task<List<ReportEnWordsCountModel>> GetReportEnWordsCounts(string userId);
         Task<List<ReportUserAssessmentModel>> GetReportUserAssessments(string userId);
+        Task<ReportUserAssessmentStatusModel?> GetReportUserAssessmentStatuses(string userId);
     }
 }

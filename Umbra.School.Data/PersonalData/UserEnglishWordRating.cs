@@ -7,7 +7,7 @@ using Umbra.School.Data.English;
 
 namespace Umbra.School.Data.PersonalData
 {
-    public class UserEnglishWordRating : BaseEntity
+    public class WordsAssessmentResult : BaseEntity
     {
         [Required]
         public string UserId { get; set; } = string.Empty;

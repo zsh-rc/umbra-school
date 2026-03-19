@@ -109,6 +109,74 @@ namespace Umbra.School.Services
                 await _context.ReportUserAssessments.ExecuteDeleteAsync();
                 _context.ReportUserAssessments.AddRange(assessmentEntities);
 
+                // Statistic User Assessment Status
+                // - Get all user's assessments from detail table.
+                var listStatus = new List<ReportUserAssessmentStatusModel>();
+                var qryTotalUserAssessments = _context.WordsAssessmentDetails
+                    .Select(wad => new
+                    {
+                        wad.UserId,
+                        wad.ApplicationUser!.UserName,
+                        wad.ApplicationUser!.Email,
+                        wad.ApplicationUser!.FullName,
+                        wad.WordsAssessementId
+                    }).Distinct()
+                    .GroupBy(wad => new
+                    {
+                        wad.UserId,
+                        wad.UserName,
+                        wad.Email,
+                        wad.FullName
+                    }).Select(g => new ReportUserAssessmentStatusModel
+                    {
+                        UserId = g.Key.UserId!,
+                        UserName = g.Key.UserName!,
+                        Email = g.Key.Email!,
+                        FullName = g.Key.FullName!,
+                        Total = g.Count()
+                    }).ToList();
+                listStatus.AddRange(qryTotalUserAssessments);
+                // - Get all user's assessments with result status from result table.
+                var qryUserAssessmentStatus = _context.AssessmentResults
+                    .GroupBy(ar => new
+                    {
+                        UserId = ar.ApplicationUser!.Id,
+                        ar.Status
+                    }).Select(g => new
+                    {
+                        g.Key.UserId,
+                        g.Key.Status,
+                        AssessmentCount = g.Count()
+                    }).ToList();
+                qryUserAssessmentStatus.ForEach(status =>
+                {
+                    var item = listStatus.FirstOrDefault(u => u.UserId == status.UserId);
+                    if (item == null)
+                    {
+                        item = new ReportUserAssessmentStatusModel
+                        {
+                            UserId = status.UserId,
+                            Total = 0
+                        };
+                        listStatus.Add(item);
+                    }
+                    else if (status.Status == AssessmentStatus.InProgress.GetDescription())
+                        item.InProgress = status.AssessmentCount;
+                    else if (status.Status == AssessmentStatus.Submitted.GetDescription())
+                        item.Submitted = status.AssessmentCount;
+                    else if (status.Status == AssessmentStatus.Reviewed.GetDescription())
+                        item.Reviewed = status.AssessmentCount;
+                });
+                // - Update NotStarted count by subtracting InProgress, Submitted and Reviewed counts from Total count
+                listStatus.ForEach(u =>
+                {
+                    u.NotStarted = u.Total - u.InProgress - u.Submitted - u.Reviewed;
+                });
+                // - Save to ReportUserAssessmentStatuses table
+                List<ReportUserAssessmentStatus> statusEntities = _mapper.Map<List<ReportUserAssessmentStatus>>(listStatus);
+                await _context.ReportUserAssessmentStatuses.ExecuteDeleteAsync();
+                _context.ReportUserAssessmentStatuses.AddRange(statusEntities);
+
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -129,6 +197,13 @@ namespace Umbra.School.Services
             var query = _context.ReportUserAssessments.Where(r => r.UserId == userId && r.Date != DateTime.MinValue);
             var list = _mapper.ProjectTo<ReportUserAssessmentModel>(query).ToList();
             return list;
+        }
+
+        public async Task<ReportUserAssessmentStatusModel?> GetReportUserAssessmentStatuses(string userId)
+        {
+            var query = _context.ReportUserAssessmentStatuses.Where(r => r.UserId == userId);
+            var list = _mapper.ProjectTo<ReportUserAssessmentStatusModel>(query).ToList();
+            return list.FirstOrDefault();
         }
     }
 }

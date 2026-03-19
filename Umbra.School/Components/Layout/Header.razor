@@ -50,17 +50,17 @@
         <NotAuthorized>
             @if (RendererInfo.IsInteractive)
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Login" Color="MudBlazor.Color.Primary" OnClick="Login"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Style="@($"color: {Colors.DeepOrange.Default};")" OnClick="Login"></MudIconButton>
             }
             else
             {
-                <MudIconButton Icon="@Icons.Material.Filled.Login" Color="MudBlazor.Color.Primary" Href="/account/login"></MudIconButton>
+                <MudIconButton Icon="@Icons.Material.Filled.Login" Style="@($"color: {Colors.DeepOrange.Default};")" Href="/account/login"></MudIconButton>
             }
         </NotAuthorized>
     </AuthorizeView>
     @if (RendererInfo.IsInteractive)
     {
-        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Color="MudBlazor.Color.Primary"
+        <MudIconButton Icon="@Icons.Material.Filled.Brightness4" Style="@($"color: {Colors.DeepOrange.Default};")"
                        OnClick="LayoutStateService.ToggleTheme" />
         <MudIconButton Icon="@Icons.Material.Outlined.MoreVert" Color="MudBlazor.Color.Inherit" />
     }

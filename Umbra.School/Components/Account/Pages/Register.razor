@@ -1,4 +1,5 @@
 ﻿@page "/Account/Register"
+@layout Components.Layout.HomeLayout
 
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -6,6 +7,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using Umbra.School.Data
+@using Umbra.School.Models.Account
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -17,47 +19,68 @@
 
 <PageTitle>Register</PageTitle>
 
-<MudText Typo="Typo.h3" GutterBottom="true">注册新用户</MudText>
+<MudPaper Class="login-register-container" Elevation="0" Square="true">
+    <MudGrid>
+        <MudItem xs="6">
+            <div class="login-register-gallery">
+                <img src="@Assets["images/robots.jpg"]" class="photo">
+                <img src="@Assets["images/login-left.jpg"]" class="photo">
+                <img src="@Assets["images/abc.jpg"]" class="photo">
+                <img src="@Assets["images/balloons.jpg"]" class="photo">
+            </div>
+        </MudItem>
+        <MudItem xs="6">
+            <StatusMessage Message="@Message" />
+            <EditForm Model="_model" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+                <DataAnnotationsValidator />
 
-<MudGrid>
-    <MudItem md="6">
-        <StatusMessage Message="@Message" />
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator />
+                <MudCard Elevation="5" Class="login-register-card">
+                    <MudCardHeader Style="justify-content:center; align-items: center;">
+                        <CardHeaderAvatar>
+                            <MudAvatar Size="MudBlazor.Size.Large" Color="MudBlazor.Color.Success">
+                                <MudIcon Icon="@Icons.Material.Filled.PersonAdd"  />
+                            </MudAvatar>
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h5">创建一个新的账户。</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudStaticTextField For="@(() => _model.Email)" @bind-Value="_model.Email"
+                                            Label="电子邮箱" Placeholder="name@example.com"
+                                            AdornmentIcon="@Icons.Material.Filled.Email" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />
 
-            <MudText Typo="Typo.body1" GutterBottom="true">创建一个新的用户。</MudText>
+                        <MudStaticTextField For="@(() => _model.Password)" @bind-Value="_model.Password"
+                                            Label="密码" InputType="InputType.Password" Placeholder="password"
+                                            AdornmentIcon="@Icons.Material.Filled.Lock" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
 
-            <MudGrid>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Email)" @bind-Value="Input.Email"
-                                        Label="电子邮箱" Placeholder="name@example.com"
-                                        UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.Password)" @bind-Value="Input.Password"
-                                        Label="密码" InputType="InputType.Password" Placeholder="password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticTextField For="@(() => Input.ConfirmPassword)" @bind-Value="Input.ConfirmPassword"
-                                        Label="确认密码" InputType="InputType.Password" Placeholder="confirm password"
-                                        UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } } )" />
-                </MudItem>
-                <MudItem md="12">
-                    <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" FormAction="FormAction.Submit">注册</MudStaticButton>
-                </MudItem>
-            </MudGrid>
-        </EditForm>
-    </MudItem>
-    <MudItem md="6">
-    </MudItem>
-</MudGrid>
+                        <MudStaticTextField For="@(() => _model.ConfirmPassword)" @bind-Value="_model.ConfirmPassword"
+                                            Label="确认密码" InputType="InputType.Password" Placeholder="confirm password"
+                                            AdornmentIcon="@Icons.Material.Filled.Lock" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
+                    </MudCardContent>
+                    <MudCardActions>
+                        <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" FullWidth="true" FormAction="FormAction.Submit">注册</MudStaticButton>
+                    </MudCardActions>
+                    <MudCardContent>
+                        <MudText Typo="Typo.body2" Align="MudBlazor.Align.Center" Class="pa-5">
+                            已经拥有账户？<MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Login", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Color="MudBlazor.Color.Success">直接登录</MudLink><br />
+                        </MudText>
+                    </MudCardContent>
+                </MudCard>
+            </EditForm>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
 
 @code {
     private IEnumerable<IdentityError>? identityErrors;
 
     [SupplyParameterFromForm]
-    private InputModel Input { get; set; } = new();
+    private RegisterModel _model { get; set; } = new();
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
@@ -68,10 +91,10 @@
     {
         var user = CreateUser();
 
-        await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+        await UserStore.SetUserNameAsync(user, _model.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
-        await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-        var result = await UserManager.CreateAsync(user, Input.Password);
+        await emailStore.SetEmailAsync(user, _model.Email, CancellationToken.None);
+        var result = await UserManager.CreateAsync(user, _model.Password);
 
         if (!result.Succeeded)
         {
@@ -88,13 +111,13 @@
             NavigationManager.ToAbsoluteUri("Account/ConfirmEmail").AbsoluteUri,
             new Dictionary<string, object?> { ["userId"] = userId, ["code"] = code, ["returnUrl"] = ReturnUrl });
 
-        await EmailSender.SendConfirmationLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+        await EmailSender.SendConfirmationLinkAsync(user, _model.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
         if (UserManager.Options.SignIn.RequireConfirmedAccount)
         {
             RedirectManager.RedirectTo(
                 "Account/RegisterConfirmation",
-                new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
+                new() { ["email"] = _model.Email, ["returnUrl"] = ReturnUrl });
         }
 
         await SignInManager.SignInAsync(user, isPersistent: false);
@@ -123,22 +146,22 @@
         return (IUserEmailStore<ApplicationUser>)UserStore;
     }
 
-    private sealed class InputModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; } = "";
+    // private sealed class InputModel
+    // {
+    //     [Required]
+    //     [EmailAddress]
+    //     [Display(Name = "Email")]
+    //     public string Email { get; set; } = "";
 
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; } = "";
+    //     [Required]
+    //     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+    //     [DataType(DataType.Password)]
+    //     [Display(Name = "Password")]
+    //     public string Password { get; set; } = "";
 
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; } = "";
-    }
+    //     [DataType(DataType.Password)]
+    //     [Display(Name = "Confirm password")]
+    //     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+    //     public string ConfirmPassword { get; set; } = "";
+    // }
 }

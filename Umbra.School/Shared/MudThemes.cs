@@ -951,7 +951,7 @@ namespace Umbra.School.Shared
             {
                 Default = new DefaultTypography
                 {
-                    FontFamily = ["Public Sans", "Roboto", "Arial", "sans-serif"],
+                    FontFamily = ["Oswald", "Noto Sans TC", "Public Sans", "Roboto", "Arial", "sans-serif"],
                     FontWeight = "400",
                     FontSize = ".875rem",
                     LineHeight = "1.43",

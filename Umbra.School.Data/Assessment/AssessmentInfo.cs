@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
+using Umbra.School.Data.PersonalData;
 
 namespace Umbra.School.Data.Assessment
 {
@@ -23,5 +24,7 @@ namespace Umbra.School.Data.Assessment
         [Required]
         public string CreatedBy { get; set; } = string.Empty;
         public DateTime? ReleaseDate { get; set; }
+        public ICollection<WordsAssessmentResult> WordsAssessmentResults { get; set; } = new List<WordsAssessmentResult>();
+
     }
 }

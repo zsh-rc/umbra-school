@@ -22,7 +22,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EnglishWord> EnglishWords { get; set; }
     public DbSet<EnglishPhrase> EnglishPhrases { get; set; }
     public DbSet<EnglishTranslation> EnglishTranslations { get; set; }
-    public DbSet<UserEnglishWordRating> UserEnglishWordRatings { get; set; }
+    public DbSet<WordsAssessmentResult> UserEnglishWordRatings { get; set; }
     public DbSet<UserEnglishPhraseRating> UserEnglishPhraseRatings { get; set; }
     public DbSet<ChineseClassicalQuestion> ChineseClassicalQuestions { get; set; }
     public DbSet<AssessmentInfo> AssessmentInfos { get; set; }
@@ -33,6 +33,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<ReportEnWordsCount> ReportEnWordsCounts { get; set; }
     public DbSet<ReportUserAssessment> ReportUserAssessments { get; set; }
+    public DbSet<ReportUserAssessmentStatus> ReportUserAssessmentStatuses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
