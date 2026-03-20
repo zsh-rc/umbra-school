@@ -85,7 +85,7 @@
         </MudCard>
     </MudItem>
     <MudItem>
-        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none" Elevation="0">
+        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none" Elevation="0" FixedHeader="true" Height="70vh">
             <ToolBarContent>
                 <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.List">已有测试计划列表</MudButton>
             </ToolBarContent>

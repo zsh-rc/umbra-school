@@ -20,7 +20,7 @@
     </MudCardHeader>
 </MudCard>
 
-<MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+<MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="60vh"
              ReadOnly="true" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(Assessment==null?"d-none":"pa-5")">
     <NoRecordsContent>
         <MudText Typo="Typo.body1">没有答题记录。</MudText>

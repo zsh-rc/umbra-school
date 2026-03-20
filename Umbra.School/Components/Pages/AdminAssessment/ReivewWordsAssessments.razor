@@ -21,7 +21,7 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudDataGrid @ref="_dataGrid" T="AssessmentResultModel" Items="@_assessmentResults" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-                             SelectedItemChanged="OnSelectedAssessmentItemChanged" MultiSelection="false" SelectOnRowClick="true" Groupable="true">
+                             SelectedItemChanged="OnSelectedAssessmentItemChanged" MultiSelection="false" SelectOnRowClick="true" Groupable="true" FixedHeader="true" Height="75vh">
                     <NoRecordsContent>
                         <MudText Typo="Typo.caption">没有提交审批的测试。</MudText>
                     </NoRecordsContent>
@@ -76,7 +76,7 @@
                                   AdornmentIcon="@Icons.Material.Filled.RateReview" Adornment="Adornment.Start"></MudTextField>
                 </MudForm>
                 <MudField Variant="Variant.Outlined" Label="答题信息" Class="mt-6">
-                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="51vh"
                                  ReadOnly="false" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(_selectedAssessmentResult==null?"d-none":"")">
                         <NoRecordsContent>
                             <MudText Typo="Typo.body1">请选择一条测试记录。</MudText>

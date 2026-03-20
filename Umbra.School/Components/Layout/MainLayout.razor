@@ -7,8 +7,8 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout>
-    <MudAppBar Elevation="2" Dense="false" Class="rounded-t-xl">
+<MudLayout Class="main-layout">
+    <MudAppBar Elevation="0" Dense="false" Class="rounded-t-xl bg-transparent">
         <Header />
     </MudAppBar>
     <MudDrawer id="nav-drawer" @bind-Open="_drawerOpen" Variant="DrawerVariant.Mini" Elevation="0" Color="MudBlazor.Color.Transparent">
@@ -18,9 +18,9 @@
         <NavMenu />
     </MudDrawer>
     <MudMainContent Class="pl-0 mud-height-full">
-        <MudPaper Elevation="0" Class="pa-5 mud-height-full rounded-b-xl" Style="min-height: 91vh">
+        <MudPaper Elevation="0" Class="pa-5 mud-height-full rounded-xl main-content" Style="">
             @Body
-        </MudPaper>        
+        </MudPaper>
     </MudMainContent>
 </MudLayout>
 

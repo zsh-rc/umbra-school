@@ -3,7 +3,7 @@
 @inject IDialogService DialogService
 
 <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-             MultiSelection="false" SelectOnRowClick="false">
+             MultiSelection="false" SelectOnRowClick="false" FixedHeader="true" Height="60vh">
     <NoRecordsContent>
         <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
     </NoRecordsContent>
@@ -65,7 +65,10 @@
         var result = await AssessmentService.GetWordsAssessments(CurrentUserId);
         if (result != null && result.Success && result.Data != null)
         {
-            _assessments = result.Data.Where(x => x.AssessmentResult != null && x.AssessmentResult.Status == AssessmentStatus.Reviewed.GetDescription()).ToList();
+            _assessments = result.Data
+                .Where(x => x.AssessmentResult != null && x.AssessmentResult.Status == AssessmentStatus.Reviewed.GetDescription())
+                .OrderByDescending(x => x.AssessmentResult!.StartTime)
+                .ToList();
         }
     }
 

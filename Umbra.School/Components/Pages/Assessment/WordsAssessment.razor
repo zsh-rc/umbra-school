@@ -26,7 +26,7 @@
         <MudStepper @ref="_stepper" ShowResetButton OnPreviewInteraction="OnPreviewInteraction">
             <MudStep Title="选择一个测试计划" HasError="@(_selectedAssessment == null)">
                 <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-                             MultiSelection="false" @bind-SelectedItem="_selectedAssessment" SelectOnRowClick="false">
+                             MultiSelection="false" @bind-SelectedItem="_selectedAssessment" SelectOnRowClick="false" FixedHeader="true" Height="60vh">
                     <NoRecordsContent>
                         <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
                     </NoRecordsContent>
@@ -110,7 +110,7 @@
 
             </MudStep>
             <MudStep Title="审阅并提交">
-                <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+                <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="60vh"
                              ReadOnly="false" EditMode="DataGridEditMode.Form" EditDialogOptions="@(new DialogOptions{ FullWidth = true })"
                              Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
                     <NoRecordsContent>

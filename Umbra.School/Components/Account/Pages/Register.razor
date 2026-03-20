@@ -17,7 +17,7 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>注册</PageTitle>
 
 <MudPaper Class="login-register-container" Elevation="0" Square="true">
     <MudGrid>
@@ -30,45 +30,56 @@
             </div>
         </MudItem>
         <MudItem xs="6">
-            <StatusMessage Message="@Message" />
             <EditForm Model="_model" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
                 <DataAnnotationsValidator />
-
                 <MudCard Elevation="5" Class="login-register-card">
                     <MudCardHeader Style="justify-content:center; align-items: center;">
                         <CardHeaderAvatar>
                             <MudAvatar Size="MudBlazor.Size.Large" Color="MudBlazor.Color.Success">
-                                <MudIcon Icon="@Icons.Material.Filled.PersonAdd"  />
+                                <MudIcon Icon="@Icons.Material.Filled.PersonAdd" />
                             </MudAvatar>
                         </CardHeaderAvatar>
                         <CardHeaderContent>
-                            <MudText Typo="Typo.h5">创建一个新的账户。</MudText>
+                            <MudText Typo="Typo.h5">创建新的账户。</MudText>
                         </CardHeaderContent>
+                        <CardHeaderActions>
+                            <MudText Typo="Typo.body2" Align="MudBlazor.Align.Center" Class="pa-5">
+                                已经拥有账户？<MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Login", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Color="MudBlazor.Color.Success">直接登录</MudLink><br />
+                            </MudText>
+                        </CardHeaderActions>
                     </MudCardHeader>
                     <MudCardContent>
+                        <StatusMessage Message="@Message" />
                         <MudStaticTextField For="@(() => _model.Email)" @bind-Value="_model.Email"
-                                            Label="电子邮箱" Placeholder="name@example.com"
+                                            Label="电子邮箱（作为登录账户）" Placeholder="name@example.com"
                                             AdornmentIcon="@Icons.Material.Filled.Email" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
                                             UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />
 
                         <MudStaticTextField For="@(() => _model.Password)" @bind-Value="_model.Password"
-                                            Label="密码" InputType="InputType.Password" Placeholder="password"
+                                            Label="密码" InputType="InputType.Password" Placeholder="至少六位并至少包含一位大小写字母和数字"
                                             AdornmentIcon="@Icons.Material.Filled.Lock" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
                                             UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
 
                         <MudStaticTextField For="@(() => _model.ConfirmPassword)" @bind-Value="_model.ConfirmPassword"
-                                            Label="确认密码" InputType="InputType.Password" Placeholder="confirm password"
+                                            Label="确认密码" InputType="InputType.Password" Placeholder="与密码相同"
                                             AdornmentIcon="@Icons.Material.Filled.Lock" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
                                             UserAttributes="@(new() { { "autocomplete", "new-password" }, { "aria-required", "true" } })" />
+                        <MudStaticTextField For="@(() => _model.PhoneNumber)" @bind-Value="_model.PhoneNumber"
+                                            Label="联系电话" Placeholder="联系电话"
+                                            AdornmentIcon="@Icons.Material.Filled.Phone" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "phone-number" }, { "aria-required", "false" } })" />
+                        <MudStaticTextField For="@(() => _model.LastName)" @bind-Value="_model.LastName"
+                                            Label="姓" Placeholder="姓"
+                                            AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "last-name" }, { "aria-required", "false" } })" />
+                        <MudStaticTextField For="@(() => _model.FirstName)" @bind-Value="_model.FirstName"
+                                            Label="名" Placeholder="名"
+                                            AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Success"
+                                            UserAttributes="@(new() { { "autocomplete", "first-name" }, { "aria-required", "false" } })" />
                     </MudCardContent>
                     <MudCardActions>
                         <MudStaticButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" FullWidth="true" FormAction="FormAction.Submit">注册</MudStaticButton>
                     </MudCardActions>
-                    <MudCardContent>
-                        <MudText Typo="Typo.body2" Align="MudBlazor.Align.Center" Class="pa-5">
-                            已经拥有账户？<MudLink Href="@(NavigationManager.GetUriWithQueryParameters("Account/Login", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Color="MudBlazor.Color.Success">直接登录</MudLink><br />
-                        </MudText>
-                    </MudCardContent>
                 </MudCard>
             </EditForm>
         </MudItem>
@@ -90,7 +101,10 @@
     public async Task RegisterUser(EditContext editContext)
     {
         var user = CreateUser();
-
+        user.PhoneNumber = _model.PhoneNumber;
+        user.LastName = _model.LastName;
+        user.FirstName = _model.FirstName;
+        user.FullName = GetFullName();
         await UserStore.SetUserNameAsync(user, _model.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, _model.Email, CancellationToken.None);
@@ -146,22 +160,15 @@
         return (IUserEmailStore<ApplicationUser>)UserStore;
     }
 
-    // private sealed class InputModel
-    // {
-    //     [Required]
-    //     [EmailAddress]
-    //     [Display(Name = "Email")]
-    //     public string Email { get; set; } = "";
-
-    //     [Required]
-    //     [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-    //     [DataType(DataType.Password)]
-    //     [Display(Name = "Password")]
-    //     public string Password { get; set; } = "";
-
-    //     [DataType(DataType.Password)]
-    //     [Display(Name = "Confirm password")]
-    //     [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-    //     public string ConfirmPassword { get; set; } = "";
-    // }
+    private string? GetFullName()
+    {
+        if (string.IsNullOrWhiteSpace(_model.FirstName) && string.IsNullOrWhiteSpace(_model.LastName))
+            return null;
+        // Logic: If either name contains Chinese characters, use Chinese format
+        if (UtilityHelper.ContainsChinese(_model.FirstName!) || UtilityHelper.ContainsChinese(_model.LastName!))
+        {
+            return $"{_model.LastName}{_model.FirstName}"; // No space for Chinese names
+        }
+        return $"{_model.FirstName} {_model.LastName}"; // Space for English names
+    }
 }

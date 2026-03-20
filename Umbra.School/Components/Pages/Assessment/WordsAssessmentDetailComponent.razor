@@ -15,7 +15,7 @@
     </MudCardHeader>
 </MudCard>
 
-<MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails"
+<MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="60vh"
              ReadOnly="true" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(Assessment==null?"d-none":"")">
     <NoRecordsContent>
         <MudText Typo="Typo.body1">没有答题记录。</MudText>
@@ -34,7 +34,16 @@
                 }
             </CellTemplate>
         </TemplateColumn>
-        <PropertyColumn Title="正确答案" Property="x => x.Word" Editable="true" />
+        <TemplateColumn Title="正确答案">
+            <CellTemplate>
+                <MudText>
+                    <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>
+                    &nbsp;
+                    <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>
+                    &nbsp;
+                </MudText>
+            </CellTemplate>
+        </TemplateColumn>
         <TemplateColumn>
             <CellTemplate>
                 @if (context.Item.Correct.HasValue && context.Item.Correct.Value)
@@ -50,6 +59,15 @@
         </TemplateColumn>
     </Columns>
 </MudDataGrid>
+
+<script>
+    function playVoice(word) {
+        const url = "https://dict.youdao.com/dictvoice?audio="+word+"&type=2";
+        const audio = new Audio(url);
+        audio.play();
+    }
+</script>
+
 
 @code {
     [Parameter]

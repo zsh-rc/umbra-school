@@ -23,10 +23,8 @@
             </div>
         </MudItem>
         <MudItem xs="6">
-            <StatusMessage Message="@errorMessage" />
             <EditForm Model="_model" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-
                 <MudCard Elevation="5" Class="login-register-card">
                     <MudCardHeader Style="justify-content:center; align-items: center;">
                         <CardHeaderAvatar>
@@ -39,6 +37,7 @@
                         </CardHeaderContent>
                     </MudCardHeader>
                     <MudCardContent>
+                        <StatusMessage Message="@errorMessage" />
                         <MudStaticTextField T="string" @bind-Value="_model.Email" For="@(() => _model.Email)" Label="电子邮箱" Variant="Variant.Outlined" FullWidth="true" Required="true"
                                             AdornmentIcon="@Icons.Material.Filled.Email" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Primary"
                                             UserAttributes="@(new() { { "autocomplete", "username" }, { "aria-required", "true" } })" />

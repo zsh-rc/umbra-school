@@ -10,27 +10,39 @@
 <MudContainer Class="mt-8 px-8 mud-full-height" MaxWidth="MaxWidth.False">
     <MudGrid>
         <MudItem xs="12">
-            <MudText Typo="Typo.h4" Class="mb-4">欢迎来到 Umbra 学习平台！</MudText>
+            <MudText Typo="Typo.h4" Class="mb-4">欢迎使用Umbra 学习平台！</MudText>
         </MudItem>
-        <MudItem xs="12" sm="6" md="4">
-            <MudField Variant="Variant.Outlined" Label="我的测试计划">
-                <MudBadge Content="@_total" Color="MudBlazor.Color.Dark" Overlap="true" Bordered="true" Class="mx-6 my-2">
+        <MudItem xs="12">
+            <MudField Variant="Variant.Outlined" Label="英语测试计划">
+                <MudBadge Content="@_total" Color="MudBlazor.Color.Dark" Overlap="true" Bordered="true" Class="mx-6">
                     <MudButton Color="MudBlazor.Color.Dark" Variant="Variant.Filled" DropShadow="false">总计</MudButton>
                 </MudBadge>
-                <MudBadge Content="@_notStarted" Color="MudBlazor.Color.Error" Overlap="true" Bordered="true" Class="mx-3 my-2">
-                    <MudButton Color="MudBlazor.Color.Error" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.NotStarted.GetDescription()</MudButton>
+                <MudBadge Content="@_notStarted" Color="MudBlazor.Color.Error" Overlap="true" Bordered="true" Class="mx-3">
+                    <MudButton Color="MudBlazor.Color.Error" Variant="Variant.Outlined" DropShadow="false"
+                               Href="/assessment/english/words">
+                        @AssessmentStatus.NotStarted.GetDescription()
+                    </MudButton>
                 </MudBadge>
-                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
-                <MudBadge Content="@_inProgress" Color="MudBlazor.Color.Warning" Overlap="true" Bordered="true" Class="mx-3 my-2">
-                    <MudButton Color="MudBlazor.Color.Warning" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.InProgress.GetDescription()</MudButton>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1" />
+                <MudBadge Content="@_inProgress" Color="MudBlazor.Color.Warning" Overlap="true" Bordered="true" Class="mx-3">
+                    <MudButton Color="MudBlazor.Color.Warning" Variant="Variant.Outlined" DropShadow="false"
+                               Href="/assessment/english/words">
+                        @AssessmentStatus.InProgress.GetDescription()
+                    </MudButton>
                 </MudBadge>
-                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
-                <MudBadge Content="@_submitted" Color="MudBlazor.Color.Secondary" Overlap="true" Bordered="true" Class="mx-3 my-2">
-                    <MudButton Color="MudBlazor.Color.Secondary" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.Submitted.GetDescription()</MudButton>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1" />
+                <MudBadge Content="@_submitted" Color="MudBlazor.Color.Secondary" Overlap="true" Bordered="true" Class="mx-3">
+                    <MudButton Color="MudBlazor.Color.Secondary" Variant="Variant.Outlined" DropShadow="false"
+                               Href="/assessment/english/words">
+                        @AssessmentStatus.Submitted.GetDescription()
+                    </MudButton>
                 </MudBadge>
-                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1 my-2" />
-                <MudBadge Content="@_reviewed" Color="MudBlazor.Color.Success" Overlap="true" Bordered="true" Class="mx-3 my-2">
-                    <MudButton Color="MudBlazor.Color.Success" Variant="Variant.Outlined" DropShadow="false">@AssessmentStatus.Reviewed.GetDescription()</MudButton>
+                <MudIcon Icon="@Icons.Material.Filled.ArrowForward" Color="MudBlazor.Color.Primary" Class="mx-1" />
+                <MudBadge Content="@_reviewed" Color="MudBlazor.Color.Success" Overlap="true" Bordered="true" Class="mx-3">
+                    <MudButton Color="MudBlazor.Color.Success" Variant="Variant.Outlined" DropShadow="false"
+                               Href="/assessment/english/words">
+                        @AssessmentStatus.Reviewed.GetDescription()
+                    </MudButton>
                 </MudBadge>
             </MudField>
             @* <MudGrid>
@@ -91,7 +103,14 @@
     List<ChartSeries<int>> _englishWordsCountSeries = new();
     ApexChartOptions<ReportEnWordsCountModel> _englishWordsCountSeriesBarChartOptions = new()
     {
-        Yaxis = new List<YAxis> { new YAxis { Show = false } },
+        PlotOptions = new PlotOptions
+        {
+            Bar = new PlotOptionsBar
+            {
+                Horizontal = true,
+            }
+        },
+        Yaxis = new List<YAxis> { new YAxis { Show = true } },
         Grid = new Grid
         {
             Xaxis = new GridXAxis { Lines = new Lines { Show = false } },
@@ -121,7 +140,8 @@
     private string? HighlightUnfamiliarColor(ReportEnWordsCountModel model)
     {
         if (model.Book == "myu") { return "#FF5734"; }
-        return null;
+        // return null;
+        return "#007bc3";
     }
 
     List<ReportUserAssessmentModel> _myAssessmentResults = new List<ReportUserAssessmentModel>();

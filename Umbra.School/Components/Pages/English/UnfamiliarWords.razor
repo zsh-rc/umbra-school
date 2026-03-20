@@ -28,7 +28,7 @@
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
-<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true">
+<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true" FixedHeader="true" Height="75vh">
     <ToolBarContent>
         <MudToolBar Dense="true">
             @{
@@ -51,7 +51,7 @@
         <MudText Typo="Typo.body1">没有任何记录。</MudText>
     </NoRecordsContent>
     <Columns>
-        <TemplateColumn CellClass="d-flex justify-end" Title="英文单词" HeaderClass="d-flex justify-end" Sortable="true" SortBy="X => X.Word">
+        <TemplateColumn Title="英文单词" Sortable="true" SortBy="X => X.Word">
             <CellTemplate>
                 <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>&nbsp;
                 <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>&nbsp;
