@@ -8,43 +8,45 @@
 @inject UserProvider UserProvider
 @inject IDialogService DialogService
 
-<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
-    <MudToolBar Dense="true">
-        <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇专项测试</MudText>
-        <MudSpacer />
-        @*         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
+<MudStack Row="false" AlignItems="AlignItems.Stretch" StretchItems="StretchItems.End">
+    <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+        <MudToolBar Dense="true">
+            <MudText Typo="Typo.h6" Style="font-weight:bold;">词汇专项测试</MudText>
+            <MudSpacer />
+            @*         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.Newspaper">提交测试</MudButton>
         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.LibraryBooks">错题本</MudButton>
         <MudButton Size="MudBlazor.Size.Small" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" Class="mr-3"
                    StartIcon="@Icons.Material.Filled.BarChart">测试分析</MudButton> *@
-    </MudToolBar>
-    <MudDivider DividerType="DividerType.FullWidth" />
-</MudPaper>
-<MudTabs @ref="_tabs" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-6">
-    <MudTabPanel Text="测试">
-        <MudStepper @ref="_stepper" ShowResetButton OnPreviewInteraction="OnPreviewInteraction">
-            <MudStep Title="选择一个测试计划" HasError="@(_selectedAssessment == null)">
-                <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-                             MultiSelection="false" @bind-SelectedItem="_selectedAssessment" SelectOnRowClick="false" FixedHeader="true" Height="60vh">
-                    <NoRecordsContent>
-                        <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
-                    </NoRecordsContent>
-                    <Columns>
-                        <TemplateColumn>
-                            <CellTemplate>
-                                @if (context.Item.AssessmentResult == null || context.Item.AssessmentResult.Status == AssessmentStatus.InProgress.GetDescription())
-                                {
-                                    <MudCheckBox T="bool"
-                                                 Value="@(context.Item == _selectedAssessment)"
-                                                 ValueChanged="@((bool val) => OnRowSelectionChanged(context.Item, val))" />
-                                }
+        </MudToolBar>
+        <MudDivider DividerType="DividerType.FullWidth" />
+    </MudPaper>
 
-                            </CellTemplate>
-                        </TemplateColumn>
-                        <TemplateColumn Title="计划名称">
-                            <CellTemplate>
-@*                                 @if (context.Item.Method == "order")
+    <MudTabs @ref="_tabs" Elevation="0" Rounded="true" ApplyEffectsToContainer="true" TabPanelsClass="pa-1" Style="height: calc(100vh - 160px);">
+        <MudTabPanel Text="测试">
+            <MudStepper @ref="_stepper" ShowResetButton OnPreviewInteraction="OnPreviewInteraction" Style="height: calc(100vh - 230px);">
+                <MudStep Title="选择一个测试计划" HasError="@(_selectedAssessment == null)">
+                    <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
+                                 MultiSelection="false" @bind-SelectedItem="_selectedAssessment" SelectOnRowClick="false" FixedHeader="true" Height="calc(100vh - 360px);">
+                        <NoRecordsContent>
+                            <MudText Typo="Typo.body1">您尚未制定或拥有任何测试计划。</MudText>
+                        </NoRecordsContent>
+                        <Columns>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    @if (context.Item.AssessmentResult == null || context.Item.AssessmentResult.Status == AssessmentStatus.InProgress.GetDescription())
+                                    {
+                                        <MudCheckBox T="bool"
+                                                     Value="@(context.Item == _selectedAssessment)"
+                                                     ValueChanged="@((bool val) => OnRowSelectionChanged(context.Item, val))" />
+                                    }
+
+                                </CellTemplate>
+                            </TemplateColumn>
+                            <TemplateColumn Title="计划名称">
+                                <CellTemplate>
+                                    @*                                 @if (context.Item.Method == "order")
                                 {
                                     if (context.Item.Source == "Unfamiliar")
                                     {
@@ -59,84 +61,86 @@
                                 {
                                     @context.Item.AssessmentInfoName
                                 } *@
-                                <MudText>@context.Item.AssessmentInfoName</MudText>
-                            </CellTemplate>
-                        </TemplateColumn>
-                        <TemplateColumn>
-                            <CellTemplate>
-                                <MudTooltip Text="建议正式测验前进行考前练习，有助于提高分数哦。" Placement="Placement.Right" Arrow="true">
-                                    <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Visibility" Class="ml-10"
-                                               OnClick="@(() => StartPractice(context.Item))" Target="_blank">练习和模拟测试</MudButton>
-                                </MudTooltip>
-                            </CellTemplate>
-                        </TemplateColumn>
-                        <PropertyColumn Property="x=>x.AssessmentResult!.Status" Title="状态" />
-                    </Columns>
-                </MudDataGrid>
-            </MudStep>
-            <MudStep Title="开始测试">
-                <MudPaper Class="pa-10">
-                    <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" @bind-Value="@_progress" Class="my-5">
-                        <MudText Typo="Typo.h3" Color="MudBlazor.Color.Dark">
-                            @if (_currentQuestionIndex < _totalQuestions)
-                            {
-                                <b>@($"{_currentQuestionIndex + 1} / {_totalQuestions}")</b>
-                            }
-                            else
-                            {
-                                <b>@($"{_currentQuestionIndex} / {_totalQuestions}")</b>
-                            }
-                        </MudText>
-                    </MudProgressLinear>
-                    <MudField Label="答题区" ShrinkLabel="false" Variant="Variant.Outlined" Class="justify-center" Underline="false">
-                        <MudForm Class="px-20 py-8">
-                            <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
-                                          AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" ReadOnly /><br /><br />
-                            <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "new-password" } })"
-                                          Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true"
-                                          AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
-                            <MudPaper Class="pa-4 mt-4" Elevation="0">
-                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
-                                           Disabled="@(_currentQuestionIndex == 0)" OnClick="Previous">@(_currentQuestionIndex == 0 ? "开始":"上一题")</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateNext" Class="mr-10"
-                                           Disabled="@(_currentQuestionIndex == _totalQuestions)" OnClick="Next">@(_currentQuestionIndex == _totalQuestions ? "完成":"下一题")</MudButton>
-                                <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="FinishForReview"
-                                           DropShadow="true" StartIcon="@Icons.Material.Filled.Done" Class="mr-10">答题完毕进入审阅</MudButton>
-                            </MudPaper>
-                        </MudForm>
+                                    <MudText>@context.Item.AssessmentInfoName</MudText>
+                                </CellTemplate>
+                            </TemplateColumn>
+                            <TemplateColumn>
+                                <CellTemplate>
+                                    <MudTooltip Text="建议正式测验前进行考前练习，有助于提高分数哦。" Placement="Placement.Right" Arrow="true">
+                                        <MudButton Variant="Variant.Outlined" Color="MudBlazor.Color.Primary" StartIcon="@Icons.Material.Filled.Visibility" Class="ml-10"
+                                                   OnClick="@(() => StartPractice(context.Item))" Target="_blank">练习和模拟测试</MudButton>
+                                    </MudTooltip>
+                                </CellTemplate>
+                            </TemplateColumn>
+                            <PropertyColumn Property="x => x.AssessmentResult!.Status" Title="状态" />
+                        </Columns>
+                    </MudDataGrid>
+                </MudStep>
+                <MudStep Title="开始测试">
+                    <MudPaper Class="pa-1">
+                        <MudProgressLinear Color="MudBlazor.Color.Success" Size="MudBlazor.Size.Large" @bind-Value="@_progress" Class="my-1">
+                            <MudText Typo="Typo.h3" Color="MudBlazor.Color.Dark">
+                                @if (_currentQuestionIndex < _totalQuestions)
+                                {
+                                    <b>@($"{_currentQuestionIndex + 1} / {_totalQuestions}")</b>
+                                }
+                                else
+                                {
+                                    <b>@($"{_currentQuestionIndex} / {_totalQuestions}")</b>
+                                }
+                            </MudText>
+                        </MudProgressLinear>
+                        <MudField Label="答题区" ShrinkLabel="false" Variant="Variant.Outlined" Class="justify-center" Underline="false">
+                            <MudForm Class="px-20 py-2">
+                                <MudTextField T="string" Label="中文" @bind-Value="@_currentWordCn"
+                                              AdornmentIcon="@Icons.Material.Filled.Translate" Adornment="Adornment.End" ReadOnly /><br /><br />
+                                <MudTextField T="string" Label="英文单词" @bind-Value="@_currentAnswerEn" UserAttributes="@(new Dictionary<string, object> { { "autocomplete", "new-password" } })"
+                                              Placeholder="在此输入正确答案后按下一题按钮。" OnKeyUp="HandleKeyUp" Immediate="true"
+                                              AdornmentIcon="@Icons.Material.Filled.Abc" Adornment="Adornment.End" AutoFocus />
+                                <MudPaper Class="pa-4 mt-4" Elevation="0">
+                                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateBefore" Class="mr-10"
+                                               Disabled="@(_currentQuestionIndex == 0)" OnClick="Previous">@(_currentQuestionIndex == 0 ? "开始":"上一题")</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Primary" DropShadow="true" StartIcon="@Icons.Material.Filled.NavigateNext" Class="mr-10"
+                                               Disabled="@(_currentQuestionIndex == _totalQuestions)" OnClick="Next">@(_currentQuestionIndex == _totalQuestions ? "完成":"下一题")</MudButton>
+                                    <MudButton Variant="Variant.Filled" Color="MudBlazor.Color.Success" OnClick="FinishForReview"
+                                               DropShadow="true" StartIcon="@Icons.Material.Filled.Done" Class="mr-10">答题完毕进入审阅</MudButton>
+                                </MudPaper>
+                            </MudForm>
 
-                    </MudField>
-                </MudPaper>
+                        </MudField>
+                    </MudPaper>
 
-            </MudStep>
-            <MudStep Title="审阅并提交">
-                <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="60vh"
-                             ReadOnly="false" EditMode="DataGridEditMode.Form" EditDialogOptions="@(new DialogOptions{ FullWidth = true })"
-                             Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
-                    <NoRecordsContent>
-                        <MudText Typo="Typo.body1">没有答题记录。</MudText>
-                    </NoRecordsContent>
-                    <Columns>
-                        <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
-                        <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
-                        <TemplateColumn Title="修正">
-                            <CellTemplate>
-                                <MudIconButton Size="MudBlazor.Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" Disabled="_step3Complete" />
-                            </CellTemplate>
-                        </TemplateColumn>
-                    </Columns>
-                </MudDataGrid>
-            </MudStep>
-        </MudStepper>
-    </MudTabPanel>
-    <MudTabPanel Text="历史记录">
-        @* <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" /> *@
-        <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" />
-    </MudTabPanel>
-    @*     <MudTabPanel Text="测试详细信息">
+                </MudStep>
+                <MudStep Title="审阅并提交">
+                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="calc(100vh - 360px);"
+                                 ReadOnly="false" EditMode="DataGridEditMode.Form" EditDialogOptions="@(new DialogOptions{ FullWidth = true })"
+                                 Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
+                        <NoRecordsContent>
+                            <MudText Typo="Typo.body1">没有答题记录。</MudText>
+                        </NoRecordsContent>
+                        <Columns>
+                            <PropertyColumn Title="中文" Property="x => x.Meaning" Editable="false" />
+                            <PropertyColumn Title="提供的答案" Property="x => x.Answer" Editable="true" />
+                            <TemplateColumn Title="修正">
+                                <CellTemplate>
+                                    <MudIconButton Size="MudBlazor.Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@context.Actions.StartEditingItemAsync" Disabled="_step3Complete" />
+                                </CellTemplate>
+                            </TemplateColumn>
+                        </Columns>
+                    </MudDataGrid>
+                </MudStep>
+            </MudStepper>
+        </MudTabPanel>
+        <MudTabPanel Text="历史记录">
+            @* <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" OnWordsAssessmentSelected="HandleSelectedWordsAssessmentFromHistory" /> *@
+            <WordsAssessmentHistoryComponent CurrentUserId="@_currentUserId" />
+        </MudTabPanel>
+        @*     <MudTabPanel Text="测试详细信息">
         <WordsAssessmentDetailComponent CurrentUserId="@_currentUserId" Assessment="@_selectedAssessment" />
     </MudTabPanel> *@
-</MudTabs>
+    </MudTabs>
+
+</MudStack>
 
 @code {
     string _currentUserId = string.Empty;
@@ -328,7 +332,7 @@
                 if (result.Success && result.Data)
                 {
                     await LoadWordsAssessments();
-                    await DialogService.ShowMessageBoxAsync("信息", "已完成提交。");                    
+                    await DialogService.ShowMessageBoxAsync("信息", "已完成提交。");
                 }
                 else
                 {

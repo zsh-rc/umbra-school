@@ -21,7 +21,7 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudDataGrid @ref="_dataGrid" T="AssessmentResultModel" Items="@_assessmentResults" Dense="false" Virtualize="false" ReadOnly="true" Elevation="0"
-                             SelectedItemChanged="OnSelectedAssessmentItemChanged" MultiSelection="false" SelectOnRowClick="true" Groupable="true" FixedHeader="true" Height="75vh">
+                             SelectedItemChanged="OnSelectedAssessmentItemChanged" MultiSelection="false" SelectOnRowClick="true" Groupable="true" FixedHeader="true" Height="calc(100vh - 280px)">
                     <NoRecordsContent>
                         <MudText Typo="Typo.caption">没有提交审批的测试。</MudText>
                     </NoRecordsContent>
@@ -65,18 +65,26 @@
             </MudCardHeader>
             <MudCardContent>
                 <MudForm Model="_selectedAssessmentResult">
-                    @if (_selectedAssessmentResult.Duration != null)
-                    {
-                        <MudField Label="时间和用时">@($"{_selectedAssessmentResult.Date.ToShortDateString()} {_selectedAssessmentResult.StartTime!.Value.ToString("h:m:s")} - {_selectedAssessmentResult.EndTime!.Value.ToString("h:m:s")} 用时{_selectedAssessmentResult.Duration}分钟")</MudField>
-                    }
-                    <MudTextField Label="最终分数" AdornmentIcon="@Icons.Material.Filled.Score" Adornment="Adornment.Start" Immediate="true"
-                                  @bind-Value="_selectedAssessmentResult.Score" For="@(() => _selectedAssessmentResult.Score)"></MudTextField>
-                    <MudTextField Label="审批意见及反馈" Lines="2" Placeholder="请在此输入此次答题情况的反馈。"
-                                  @bind-Value="_selectedAssessmentResult.Feedback" For="@(() => _selectedAssessmentResult.Feedback)"
-                                  AdornmentIcon="@Icons.Material.Filled.RateReview" Adornment="Adornment.Start"></MudTextField>
+                    <MudGrid>
+                        @if (_selectedAssessmentResult.Duration != null)
+                        {
+                            <MudItem xs="4">
+                                <MudField Label="时间和用时">@($"{_selectedAssessmentResult.Date.ToShortDateString()} {_selectedAssessmentResult.StartTime!.Value.ToString("h:m:s")} - {_selectedAssessmentResult.EndTime!.Value.ToString("h:m:s")} 用时{_selectedAssessmentResult.Duration}分钟")</MudField>
+                            </MudItem>
+                        }
+                        <MudItem xs="3">
+                            <MudTextField Label="最终分数" AdornmentIcon="@Icons.Material.Filled.Score" Adornment="Adornment.Start" Immediate="true"
+                                          @bind-Value="_selectedAssessmentResult.Score" For="@(() => _selectedAssessmentResult.Score)"></MudTextField>
+                        </MudItem>
+                        <MudItem xs="5">
+                            <MudTextField Label="审批意见及反馈" Placeholder="请在此输入此次答题情况的反馈。"
+                                          @bind-Value="_selectedAssessmentResult.Feedback" For="@(() => _selectedAssessmentResult.Feedback)"
+                                          AdornmentIcon="@Icons.Material.Filled.RateReview" Adornment="Adornment.Start"></MudTextField>
+                        </MudItem>
+                    </MudGrid>
                 </MudForm>
                 <MudField Variant="Variant.Outlined" Label="答题信息" Class="mt-6">
-                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="51vh"
+                    <MudDataGrid @ref="_reviewDataGrid" T="WordsAssessmentDetailModel" Items="@_assessmentDetails" FixedHeader="true" Height="calc(100vh - 400px)"
                                  ReadOnly="false" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0" Class="@(_selectedAssessmentResult==null?"d-none":"")">
                         <NoRecordsContent>
                             <MudText Typo="Typo.body1">请选择一条测试记录。</MudText>

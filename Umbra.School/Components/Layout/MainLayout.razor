@@ -7,7 +7,7 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout Class="main-layout">
+<MudLayout Class="base-layout main-layout">
     <MudAppBar Elevation="0" Dense="false" Class="rounded-t-xl bg-transparent">
         <Header />
     </MudAppBar>
@@ -17,8 +17,8 @@
         </MudDrawerHeader>
         <NavMenu />
     </MudDrawer>
-    <MudMainContent Class="pl-0 mud-height-full">
-        <MudPaper Elevation="0" Class="pa-5 mud-height-full rounded-xl main-content" Style="">
+    <MudMainContent Class="pl-0 mud-height-full main-content">
+        <MudPaper Elevation="0" Class="pa-5 rounded-xl content">
             @Body
         </MudPaper>
     </MudMainContent>

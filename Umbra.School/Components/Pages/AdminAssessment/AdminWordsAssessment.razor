@@ -70,11 +70,17 @@
                         </MudRadioGroup>
                     </MudField>
                     <MudField Label="出题方式" Variant="Variant.Outlined">
-                        <MudRadioGroup T="string" @bind-Value="_model.Method" For="@(() => _model.Method)" Required>
-                            <MudRadio Value="@("random")" Size="MudBlazor.Size.Small" Disabled="@(_repeatable)">随机</MudRadio>
-                            <MudRadio Value="@("order")" Size="MudBlazor.Size.Small">顺序</MudRadio>
-                        </MudRadioGroup>
-                        <MudNumericField T="Int32" @bind-Value="_model.StartIndex" For="@(() => _model.StartIndex)" Label="开始" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Disabled="@(_model.Method == "random")" />
+                        <MudGrid>
+                            <MudItem xs="6">
+                                <MudRadioGroup T="string" @bind-Value="_model.Method" For="@(() => _model.Method)" Required>
+                                    <MudRadio Value="@("random")" Size="MudBlazor.Size.Small" Disabled="@(_repeatable)">随机</MudRadio>
+                                    <MudRadio Value="@("order")" Size="MudBlazor.Size.Small">顺序</MudRadio>
+                                </MudRadioGroup>
+                            </MudItem>
+                            <MudItem xs="6">
+                                <MudNumericField T="Int32" @bind-Value="_model.StartIndex" For="@(() => _model.StartIndex)" Label="开始" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Disabled="@(_model.Method == "random")" />
+                            </MudItem>
+                        </MudGrid>
                     </MudField>
                     <MudField Label="预期时间（分钟）" Variant="Variant.Outlined">
                         <MudNumericField T="Int32" @bind-Value="_model.ExpectDuration" For="@(() => _model.ExpectDuration)" Variant="Variant.Text" Min="1" Step="10" Class="ml-3" Required="true" />

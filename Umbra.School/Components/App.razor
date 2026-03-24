@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <base href="/" />  
+    <base href="/" />
     <!--Fonts: Oswald / Noto Sans Traditional Chinese -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     <HeadOutlet @rendermode="PageRenderMode" />
 </head>
 
-<body>
+<body style="@($"background-image: url(images/{(HttpContext.AcceptsInteractiveRouting() ? "drip-bg.jpg" : "background.jpg")})")">
     <Routes @rendermode="PageRenderMode" />
     <script src="_framework/blazor.web.js"></script>
     <script src=@Assets["_content/MudBlazor/MudBlazor.min.js"]></script>

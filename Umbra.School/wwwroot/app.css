@@ -2,32 +2,44 @@
     height: 100%;
     margin: 0px;
     padding: 0px;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    opacity: 0.9;
+}
+
+/*.base-layout {
+    height: 100%;
+    min-height: 100vh !important;
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    z-index: 0;
 }
 
 .home-layout {
-    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url(images/background.jpg);
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; /* This keeps the image stationary */
-    min-height: 100px;
-    z-index: 0;
+    background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5),rgba(0,0,0,0.5)), url(images/background.jpg) !important;
 }
 
 .main-layout {
-    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url(images/drip-bg.jpg);
-    height: 100vh;
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; /* This keeps the image stationary */
-    min-height: 100px;
-    z-index: 0;
-}
+    background-image: linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url(images/drip-bg.jpg) !important;
+}*/
 
 .main-content {
-    min-height: 91vh;
+    height: 100vh;
+    /*min-height: 100vh !important;*/ /* Ensure it fills the viewport height */
+    /*display: flex;
+    flex-direction: column;*/
     overflow: hidden;
     opacity: 0.9;
+}
+
+.content {
+    height: 100vh;
+    overflow: hidden;
 }
 
 .bg-transparent {
@@ -67,7 +79,7 @@
         mask: radial-gradient(var(--s),#000 100%,#0000 calc(100% + 1px)) 0 0/calc(4*var(--s)) calc(4*var(--s)), var(--_g) calc(100% - 6*var(--s)) calc(100% - 6*var(--s)), var(--_g) calc(100% - 4*var(--s)) calc(100% - 4*var(--s)) intersect, radial-gradient(var(--s),#0000 calc(100% - 1px),#000) var(--s) var(--s)/calc(2*var(--s)) calc(2*var(--s));
     }
 
-    /* Apply random rotation to every 2nd and 3rd item */
+        /* Apply random rotation to every 2nd and 3rd item */
 
         .login-register-gallery .photo:nth-child(2n) {
             background: linear-gradient(45deg,#F8CA00,#FF6B6B);

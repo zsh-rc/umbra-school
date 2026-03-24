@@ -26,3 +26,16 @@ order by ew.Sort
 --delete from [WordsAssessmentDetails]
 --delete from [WordsAssessments]
 --delete from [AssessmentInfos]
+
+-- Update meaning
+update EnglishWords
+set Meaning = N'v.操纵，控制；经营，管理（企业）；动手术；'
+where id in (
+	select id from EnglishWords where word = 'Operate'
+)
+-- Update existing assessment details
+update WordsAssessmentDetails
+set Meaning = N'v.操纵，控制；经营，管理（企业）；动手术；'
+where id in (
+	select id from WordsAssessmentDetails where word = 'Operate'
+)

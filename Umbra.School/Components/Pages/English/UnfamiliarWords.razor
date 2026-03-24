@@ -28,7 +28,8 @@
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
-<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true" FixedHeader="true" Height="75vh">
+<MudDataGrid @ref="_dataGrid" T="EnglishWordModel" Items="@_allItems" Dense="true" Virtualize="false" ReadOnly="true" 
+             Elevation="0" FixedHeader="true" Height="calc(100vh - 220px)">
     <ToolBarContent>
         <MudToolBar Dense="true">
             @{
