@@ -36,7 +36,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString)
         .LogTo(Console.WriteLine, LogLevel.Critical)
         .EnableSensitiveDataLogging(false)
-    ); 
+    );
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddIdentityCore<ApplicationUser>(options =>
@@ -54,6 +54,8 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
         options.Password.RequireNonAlphanumeric = false;  // 是否需要特殊字符 (@, #, $ 等)
         // 3. 唯一字符要求：设置为 1 表示不要求字符必须互不相同（默认 1）
         options.Password.RequiredUniqueChars = 1;
+
+        options.Lockout = new LockoutOptions { MaxFailedAccessAttempts = 5 };        
     })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()

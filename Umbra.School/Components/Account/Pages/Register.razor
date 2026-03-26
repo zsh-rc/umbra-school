@@ -10,6 +10,7 @@
 @using Umbra.School.Models.Account
 
 @inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<ApplicationRole> RoleManager
 @inject IUserStore<ApplicationUser> UserStore
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IEmailSender<ApplicationUser> EmailSender
@@ -117,6 +118,13 @@
         }
 
         Logger.LogInformation("User created a new account with password.");
+
+        // Add to default role "Users"
+        var roleUsers = await RoleManager.FindByNameAsync("Users");
+        if (roleUsers != null)
+        {
+            await UserManager.AddToRoleAsync(user, "Users");
+        }
 
         var userId = await UserManager.GetUserIdAsync(user);
         var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);

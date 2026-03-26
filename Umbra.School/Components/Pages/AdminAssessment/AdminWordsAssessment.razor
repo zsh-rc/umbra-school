@@ -29,13 +29,12 @@
             </MudCardHeader>
             <MudCardContent Class="pt-0">
                 <MudForm Model="_model" Disabled="@_planFormDisabled">
-                    <MudField Label="测试计划" Variant="Variant.Outlined">
-                        <MudStack Row>
-                            <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="名称" Class="mb-2" Required FullWidth />
-                            <MudSwitch T="bool" Label="重复多天" Color="MudBlazor.Color.Primary" ValueChanged="@(value => OnRepeatChange(value))" />
-                            <MudTextField T="int" @bind-Value="_model.RepeatTimes" For="@(() => _model.RepeatTimes)" FullWidth="false" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.EventRepeat" AdornmentColor="MudBlazor.Color.Success" Disabled="@(!_repeatable)" />
-                        </MudStack>
-                    </MudField>
+                    <MudStack Row>
+                        <MudTextField T="string" @bind-Value="_model.AssessmentInfoName" For="@(() => _model.AssessmentInfoName)" Label="名称" Class="mb-2" Required FullWidth />
+                        <MudSwitch T="bool" Label="重复多天" Color="MudBlazor.Color.Primary" ValueChanged="@(value => OnRepeatChange(value))" />
+                        <MudTextField T="int" @bind-Value="_model.RepeatTimes" For="@(() => _model.RepeatTimes)" FullWidth="false"
+                                      Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.EventRepeat" AdornmentColor="MudBlazor.Color.Success" Disabled="@(!_repeatable)" />
+                    </MudStack>
                     <MudField Label="范围" Variant="Variant.Outlined">
                         <MudToggleGroup T="string" @bind-Value="_model.Scope" SelectionMode="SelectionMode.SingleSelection" Color="MudBlazor.Color.Secondary"
                                         CheckMark="true" FixedContent="true">
@@ -51,11 +50,11 @@
                             <MudRadio Value="@("Unfamiliar")" Size="MudBlazor.Size.Small">生词（★&lt;=3）</MudRadio>
                             @* <MudRadio Value="@("ErrorNotes")" Size="MudBlazor.Size.Small">以往错题</MudRadio> *@
                         </MudRadioGroup>
-                        <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_users"
-                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="@(new Func<IReadOnlyList<string>, string>(GetMultiSelectionText))">
+                        <MudSelect T="ApplicationUserModel" Label="针对用户（可多选）" MultiSelection="true" @bind-SelectedValues="_selectedUsers"
+                                   SelectAll="true" SelectAllText="所有用户" MultiSelectionTextFunc="GetMultiSelectionText">
                             @foreach (var user in _allUsers)
                             {
-                                <MudSelectItem T="ApplicationUserModel" Value="@(user)">@user.UserName</MudSelectItem>
+                                <MudSelectItem T="ApplicationUserModel" Value="@(user)">@($"{user.FullName} | {user.UserName}")</MudSelectItem>
                             }
                         </MudSelect>
                     </MudField>
@@ -91,7 +90,8 @@
         </MudCard>
     </MudItem>
     <MudItem>
-        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="true" Virtualize="false" ReadOnly="true" HeaderClass="d-none" Elevation="0" FixedHeader="true" Height="70vh">
+        <MudDataGrid @ref="_dataGrid" T="WordsAssessmentModel" Items="@_assessments" Dense="true" Virtualize="false"
+                     ReadOnly="true" Elevation="0" FixedHeader="true" Height="calc(100vh - 250px)">
             <ToolBarContent>
                 <MudButton Variant="Variant.Text" StartIcon="@Icons.Material.Filled.List">已有测试计划列表</MudButton>
             </ToolBarContent>
@@ -123,8 +123,8 @@
 </MudGrid>
 
 @code {
-    List<ApplicationUserModel> _allUsers = new();
-    IReadOnlyCollection<ApplicationUserModel> _users = new HashSet<ApplicationUserModel>();
+    List<ApplicationUserModel> _allUsers = new List<ApplicationUserModel>();
+    IReadOnlyCollection<ApplicationUserModel> _selectedUsers = new HashSet<ApplicationUserModel>();
 
     MudDataGrid<WordsAssessmentModel>? _dataGrid;
     List<WordsAssessmentModel> _assessments = new List<WordsAssessmentModel>();
@@ -158,15 +158,17 @@
         await base.OnInitializedAsync();
         await LoadWordsAssessments();
         InitializeForm();
+        await GetAllApplicationUsers();
+        StateHasChanged();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        if (firstRender)
-        {
-            await GetAllApplicationUsers();
-        }
+        // if (firstRender)
+        // {
+        //     await GetAllApplicationUsers();
+        // }
     }
 
     private string GetMultiSelectionText(IReadOnlyList<string> selectedValues)
@@ -176,11 +178,7 @@
 
     async Task GetAllApplicationUsers()
     {
-        var result = await AccountService.GetAllApplicationUsers();
-        if (result != null && result.Success && result.Data != null)
-        {
-            _allUsers = result.Data;
-        }
+        _allUsers = await AccountService.GetAllApplicationUsers();
     }
 
     void InitializeForm()
@@ -226,7 +224,7 @@
             AppSnackbarService.ShowError("请提供一个测试计划名称。");
             return;
         }
-        if (_users.Count() == 0)
+        if (_selectedUsers.Count() == 0)
         {
             AppSnackbarService.ShowError("请至少选择一个用户。");
             return;
@@ -243,8 +241,8 @@
         var summary = $"{_scopes[_model.Scope]} » {_sources[_model.Source]}（{_model.WordCount}以内，{_methods[_model.Method]}{(_model.Method == "order" ? $"，从{_model.StartIndex}开始" : "")}）";
         _model.ShortSummary = summary;
         _model.StartIndex = _model.Method == "random" ? -1 : _model.StartIndex;
-        string userIds = string.Join(";", _users.Select(u => u.Id).ToList());
-        string usernames = string.Join(";", _users.Select(u => u.UserName).ToList());
+        string userIds = string.Join(";", _selectedUsers.Select(u => u.Id).ToList());
+        string usernames = string.Join(";", _selectedUsers.Select(u => u.UserName).ToList());
         _model.AssessmentInfo = new AssessmentInfoModel
         {
             Name = _model.AssessmentInfoName,

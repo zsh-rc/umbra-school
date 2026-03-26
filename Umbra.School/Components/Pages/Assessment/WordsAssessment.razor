@@ -46,21 +46,6 @@
                             </TemplateColumn>
                             <TemplateColumn Title="计划名称">
                                 <CellTemplate>
-                                    @*                                 @if (context.Item.Method == "order")
-                                {
-                                    if (context.Item.Source == "Unfamiliar")
-                                    {
-                                        <MudLink Href="@($"english/words/unfamiliar/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
-                                    }
-                                    else
-                                    {
-                                        <MudLink Href="@($"/english/words/{context.Item.Scope}/{context.Item.StartIndex}/{context.Item.StartIndex + context.Item.WordCount - 1}")">@context.Item.AssessmentInfoName</MudLink>
-                                    }
-                                }
-                                else
-                                {
-                                    @context.Item.AssessmentInfoName
-                                } *@
                                     <MudText>@context.Item.AssessmentInfoName</MudText>
                                 </CellTemplate>
                             </TemplateColumn>

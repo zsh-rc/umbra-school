@@ -1,0 +1,160 @@
+﻿@page "/admin/users"
+@attribute [Authorize(Roles = "Administrators")]
+@using Umbra.School.Models.Account
+@inject IAccountService AccountService
+@inject AppSnackbarService AppSnackbarService
+@inject IDialogService DialogService
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">用户管理</MudText>
+        <MudSpacer />
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudDataGrid @ref="_dataGrid" T="ApplicationUserModel" Items="@_items" Dense="true" Virtualize="false" Elevation="0" FixedHeader="true" Height="calc(100vh - 220px)">
+    <ToolBarContent>
+    </ToolBarContent>
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">没有任何记录。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <PropertyColumn Property="x => x.UserName" Title="用户名" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="x => x.FullName" Title="姓名" Sortable="true"></PropertyColumn>
+        <PropertyColumn Property="x => x.PhoneNumber" Title="联系电话" Sortable="true"></PropertyColumn>
+        <TemplateColumn Title="激活">
+            <CellTemplate>
+                @if (context.Item.EmailConfirmed)
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Success"></MudIcon>
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Filled.Close" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Error"></MudIcon>
+                    <MudLink EndIcon="@Icons.Material.Filled.Check" Typo="Typo.caption" OnClick="@(() => ConfirmEmail(context.Item))" UserAttributes="@(new() { { "title", "点此激活账号" } })">激活</MudLink>
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="密码">
+            <CellTemplate>
+                <MudLink EndIcon="@Icons.Material.Filled.Password" Typo="Typo.caption" OnClick="@(() => ResetPassword(context.Item))" UserAttributes="@(new() { { "title", "点此重置用户名密码" } })">重置</MudLink>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="状态">
+            <CellTemplate>
+                @{
+                    var locked = context.Item.LockoutEnd;
+                    if (locked != null)
+                    {
+                        <MudTooltip Text="@($"锁定时间：{locked.Value.DateTime.ToString()}")">
+                            <MudIcon Icon="@Icons.Material.Filled.Lock" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Error" UserAttributes="@(new() { { "title", @locked.Value.Date.ToShortDateString() } })"></MudIcon>
+                        </MudTooltip>
+                        <MudLink EndIcon="@Icons.Material.Filled.LockOpen" Typo="Typo.caption" OnClick="@(() => Unlock(context.Item))" UserAttributes="@(new() { { "title", "点此解除锁定" } })">解除</MudLink>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Success"></MudIcon>
+                        <MudLink EndIcon="@Icons.Material.Filled.Lock" Typo="Typo.caption" OnClick="@(() => Lock(context.Item))" UserAttributes="@(new() { { "title", "点此锁定登录" } })">锁定</MudLink>
+                    }
+                }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="角色" Sortable="false">
+            <CellTemplate>
+                <MudButton StartIcon="@Icons.Material.Filled.AdminPanelSettings" Variant="Variant.Outlined" Size="MudBlazor.Size.Small" class="my-1 ms-1"
+                           OnClick="@(() => ShowUserRoles(context.Item))">
+                    角色
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+@code {
+    MudDataGrid<ApplicationUserModel> _dataGrid = new MudDataGrid<ApplicationUserModel>();
+    List<ApplicationUserModel> _items { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    public async Task LoadData()
+    {
+        var list = (await AccountService.GetAllApplicationUsers()).OrderBy(r => r.UserName);
+        _items = list.ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task ConfirmEmail(ApplicationUserModel model)
+    {
+        var result = await AccountService.ConfirmEmail(model.Id);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"账户已激活。");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"账户激活失败。");
+        }
+    }
+
+    async Task Lock(ApplicationUserModel model)
+    {
+        var result = await AccountService.LockUser(model.Id, true);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"账号已被锁定。");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"账号锁定失败。({result.Code})");
+        }
+    }
+
+    async Task Unlock(ApplicationUserModel model)
+    {
+        var result = await AccountService.LockUser(model.Id, false);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"账号已被解锁成功。");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"账号解锁失败。({result.Code})");
+        }
+    }
+
+    async Task ResetPassword(ApplicationUserModel model)
+    {
+        var result = await AccountService.ResetPassword(model.Id);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"密码已重置，新密码为：{result.Data}");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"密码重置失败。({result.Code})");
+        }
+    }
+
+    Task ShowUserRoles(ApplicationUserModel user)
+    {
+        var parameters = new DialogParameters<UserRolesComponent>
+        {
+            { x => x.User, user }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraExtraLarge};
+
+        return DialogService.ShowAsync<UserRolesComponent>("用户角色", parameters, options);
+    }
+
+
+}

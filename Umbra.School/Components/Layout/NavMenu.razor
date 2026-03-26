@@ -41,7 +41,9 @@
                 </MudNavGroup>
             </MudNavGroup>
             <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin")" Icon="@Icons.Material.Filled.Settings">
-                <MudNavLink Href="/admin/userroles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="Job Dashboard" Target="_blank">用户角色管理</MudNavLink>
+                <MudNavLink Href="/admin/users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">用户管理</MudNavLink>
+                <MudNavLink Href="/admin/roles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">角色管理</MudNavLink>
+                <MudNavLink Href="/admin/userroles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户角色管理">用户角色管理</MudNavLink>
             </MudNavGroup>
             <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard" Target="_blank">后台管理面板 ↗</MudNavLink>
         </Authorized>
