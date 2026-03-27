@@ -1,6 +1,13 @@
 ﻿@using Umbra.School.Models.Account
 @inject IAccountService AccountService
 @inject AppSnackbarService AppSnackbarService
+
+<style>
+    .mud-dialog {
+        padding: 20px;
+    }
+</style>
+
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
     <MudToolBar Dense="true">
         <MudText Typo="Typo.h6" Style="font-weight:bold;">@($"{User.UserName} | {User.FullName}")</MudText>
@@ -12,7 +19,7 @@
 <MudDataGrid @ref="_dataGrid" T="ApplicationRoleModel" Items="@_items"
              ReadOnly="true" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
     <ToolBarContent>
-        <MudSelect T="ApplicationRoleModel" Label="分配角色" MultiSelection="true" @bind-SelectedValues="_selectRoles"
+        <MudSelect T="ApplicationRoleModel" Label="分配角色" MultiSelection="true" @bind-SelectedValues="_selectRoles" Dense="true" RelativeWidth="DropdownWidth.Adaptive"
                    SelectAll="false" SelectAllText="所有角色" MultiSelectionTextFunc="GetMultiSelectionText" ToStringFunc="@(r => r.Name)">
             @foreach (var role in _missingRoles)
             {

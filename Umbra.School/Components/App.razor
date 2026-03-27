@@ -17,7 +17,7 @@
     <HeadOutlet @rendermode="PageRenderMode" />
 </head>
 
-<body style="@($"background-image: url(images/{(HttpContext.AcceptsInteractiveRouting() ? "drip-bg.jpg" : "background.jpg")})")">
+<body style="@($"background:linear-gradient(rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.45)), url(images/{(HttpContext.AcceptsInteractiveRouting() ? "drip-bg.jpg" : "background.jpg")})")">
     <Routes @rendermode="PageRenderMode" />
     <script src="_framework/blazor.web.js"></script>
     <script src=@Assets["_content/MudBlazor/MudBlazor.min.js"]></script>

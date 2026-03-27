@@ -1,13 +1,179 @@
 ﻿@page "/admin/roles"
+@attribute [Authorize(Roles = "Administrators")]
+@using Umbra.School.Models.Account
+@inject IAccountService AccountService
+@inject AppSnackbarService AppSnackbarService
+@inject IDialogService DialogService
 
 <MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
     <MudToolBar Dense="true">
         <MudText Typo="Typo.h6" Style="font-weight:bold;">角色管理</MudText>
         <MudSpacer />
+        <MudButton StartIcon="@Icons.Material.Filled.Add" Color="MudBlazor.Color.Primary" OnClick="AddNewItem">增加角色</MudButton>
     </MudToolBar>
     <MudDivider DividerType="DividerType.FullWidth" />
 </MudPaper>
 
+<MudDataGrid @ref="_dataGrid" T="ApplicationRoleModel" Items="@_items" Dense="true" Virtualize="false" Elevation="0" FixedHeader="true" Height="calc(100vh - 220px)"
+             ReadOnly="false" EditTrigger="DataGridEditTrigger.Manual" EditMode="DataGridEditMode.Form" EditDialogOptions="_editDialogOptions"
+             StartedEditingItem="@StartedEditingItem" CommittedItemChanges="@CommittedItemChanges" CanceledEditingItem="@CanceledEditingItem">
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">没有任何记录。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Id" Title="Id" Sortable="false" Hidden="true" Editable="false"></PropertyColumn>
+        <PropertyColumn Property="x => x.Name" Title="角色名称" Sortable="true">
+            <EditTemplate>
+                <MudTextField @bind-Value="context.Item.Name" Label="角色名称" Required="true"></MudTextField>
+            </EditTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="x => x.Enabled" Title="是否启用" Sortable="true" Hidden="true"></PropertyColumn>
+        <TemplateColumn Title="是否启用">
+            <CellTemplate>
+                @{
+                    var enabled = context.Item.Enabled;
+                    if (!enabled)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Close" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Error"></MudIcon>
+                        <MudLink EndIcon="@Icons.Material.Filled.Check" Typo="Typo.caption" OnClick="@(() => Enable(context.Item))" UserAttributes="@(new() { { "title", "点此启用" } })">启用</MudLink>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.ThumbUp" Size="MudBlazor.Size.Small" Color="MudBlazor.Color.Success"></MudIcon>
+                        <MudLink EndIcon="@Icons.Material.Filled.Lock" Typo="Typo.caption" OnClick="@(() => Disable(context.Item))" UserAttributes="@(new() { { "title", "点此禁用" } })">禁用</MudLink>
+                    }
+                }
+            </CellTemplate>
+            <EditTemplate>
+                <MudSwitch @bind-Value="context.Item.Enabled" Label="是否启用" Color="MudBlazor.Color.Primary" />
+            </EditTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="用户列表" Sortable="false">
+            <CellTemplate>
+                <MudButton StartIcon="@Icons.Material.Filled.AdminPanelSettings" Variant="Variant.Outlined" Size="MudBlazor.Size.Small" class="my-1 ms-1"
+                           OnClick="@(() => ShowRoleUsers(context.Item))">
+                    用户列表
+                </MudButton>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title ="操作" Sortable="false" Editable="false">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Filled.EditNote" OnClick="@(() => context.Actions.StartEditingItemAsync())" />
+                <MudIconButton Icon="@Icons.Material.Filled.Delete" OnClick="@(() => DeleteItem(context.Item))" Disabled="@(context.Item.Name == "Administrators")" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
 @code {
+    MudDataGrid<ApplicationRoleModel> _dataGrid = new MudDataGrid<ApplicationRoleModel>();
+    List<ApplicationRoleModel> _items { get; set; } = new();
+    DialogOptions _editDialogOptions = new DialogOptions { BackdropClick = false };
+    bool _isAddNew = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadData();
+    }
+
+    public async Task LoadData()
+    {
+        var list = (await AccountService.GetAllApplicationRoles()).OrderBy(r => r.Name);
+        _items = list.ToList();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task Disable(ApplicationRoleModel model)
+    {
+        var result = await AccountService.EnableRole(model.Id, false);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"角色已被禁用。");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"禁用角色失败。({result.Code})");
+        }
+    }
+
+    async Task Enable(ApplicationRoleModel model)
+    {
+        var result = await AccountService.EnableRole(model.Id, true);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"角色已被启用。");
+            await LoadData();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"启用角色失败。({result.Code})");
+        }
+    }
+
+    Task ShowRoleUsers(ApplicationRoleModel role)
+    {
+        var parameters = new DialogParameters<RoleUsersComponent>
+        {
+            { x => x.Role, role }
+        };
+
+        var options = new DialogOptions() { CloseButton = true, MaxWidth = MaxWidth.ExtraExtraLarge };
+
+        return DialogService.ShowAsync<RoleUsersComponent>("用户列表", parameters, options);
+    }
+
+    async Task AddNewItem()
+    {
+        if (_dataGrid == null) return;
+        var item = new ApplicationRoleModel()
+        {
+            Id = Guid.Empty.ToString(),
+            Enabled = true
+        };
+        _items.Add(item);
+        await _dataGrid.SetEditingItemAsync(item);
+    }
+
+    private void StartedEditingItem(ApplicationRoleModel item)
+    {
+    }
+
+    async Task<DataGridEditFormAction> CommittedItemChanges(ApplicationRoleModel item)
+    {
+        _isAddNew = item.Id == Guid.Empty.ToString();
+        if (_isAddNew)
+        {
+            var result = await AccountService.CreateRole(item);
+        }
+        else
+        {
+            var result = await AccountService.UpdateRole(item);
+        }
+        await LoadData();
+
+        return DataGridEditFormAction.Close;
+    }
+
+    async Task CanceledEditingItem(ApplicationRoleModel item)
+    {
+        _isAddNew = item.Id == Guid.Empty.ToString();
+        if (_isAddNew) _items.Remove(item);
+        await LoadData();
+    }
+
+    async Task DeleteItem(ApplicationRoleModel item)
+    {
+        bool? result = await DialogService.ShowMessageBoxAsync(
+            "警告",
+            "删除操作不可恢复，要继续吗？",
+            yesText: "删除", cancelText: "取消");
+        if (result.HasValue && result.Value)
+        {
+            await AccountService.DeleteRole(item.Id);
+            await LoadData();
+        }
+    }
 
 }

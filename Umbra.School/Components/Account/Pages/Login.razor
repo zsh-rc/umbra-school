@@ -44,8 +44,8 @@
                         <MudStaticTextField T="string" @bind-Value="_model.Password" For="@(() => _model.Password)" Label="密码" Variant="Variant.Outlined" FullWidth="true" Required="true" InputType="InputType.Password"
                                             AdornmentIcon="@Icons.Material.Filled.Lock" Adornment="Adornment.Start" AdornmentColor="MudBlazor.Color.Primary"
                                             UserAttributes="@(new() { { "autocomplete", "current-password" }, { "aria-required", "true" } } )" />
-                        <MudStack Row="true" StretchItems="StretchItems.Start">
-                            <MudCheckBox T="bool" @bind-Value="_model.RememberMe" For="@(() => _model.RememberMe)" Label="记住登录信息" Size="MudBlazor.Size.Small" Class="" />
+                        <MudStack Row="true" StretchItems="StretchItems.Start">                            
+                            <MudStaticCheckBox T="bool" @bind-Value="_model.RememberMe" For="@(() => _model.RememberMe)" Label="记住登录信息" Color="MudBlazor.Color.Primary" Size="MudBlazor.Size.Small" />
                             <MudLink Href="Account/ForgotPassword" Typo="Typo.body2" Class="pa-3">忘记密码？</MudLink>
                         </MudStack>
                     </MudCardContent>

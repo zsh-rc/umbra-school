@@ -1,0 +1,102 @@
+﻿@using Umbra.School.Models.Account
+@inject IAccountService AccountService
+@inject AppSnackbarService AppSnackbarService
+
+<style>
+    .mud-dialog {
+        padding: 20px;
+    }
+</style>
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">@($"{Role.Name} ({Role.Enabled})")</MudText>
+        <MudSpacer />
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudDataGrid @ref="_dataGrid" T="ApplicationUserModel" Items="@_items"
+             ReadOnly="true" Dense="true" Virtualize="false" SortMode="SortMode.None" Elevation="0">
+    <ToolBarContent>
+        <MudSelect T="ApplicationUserModel" Label="增加用户" MultiSelection="true" @bind-SelectedValues="_selectUsers" Dense="true" RelativeWidth="DropdownWidth.Adaptive"
+                   SelectAll="false" SelectAllText="所有用户" MultiSelectionTextFunc="GetMultiSelectionText" ToStringFunc="@(r => r.FullName)">
+            @foreach (var user in _usersWithoutTheRole)
+            {
+                <MudSelectItem T="ApplicationUserModel" Value="@(user)">@($"{user.UserName} | {user.FullName}")</MudSelectItem>
+            }
+        </MudSelect>
+        <MudLink StartIcon="@Icons.Material.Filled.Add" Size="MudBlazor.Size.Small" Typo="Typo.caption" OnClick="@AddRoleUsers">分配角色</MudLink>
+    </ToolBarContent>
+
+    <NoRecordsContent>
+        <MudText Typo="Typo.body1">没有分配该角色的用户。</MudText>
+    </NoRecordsContent>
+    <Columns>
+        <PropertyColumn Title="Id" Property="x => x.Id" Hidden="true" />
+        <PropertyColumn Title="用户名" Property="x => x.UserName" />
+        <PropertyColumn Title="姓名" Property="x => x.FullName" />
+        <TemplateColumn Title="去除用户" Sortable="false">
+            <CellTemplate>
+                <MudLink EndIcon="@Icons.Material.Filled.Remove" Typo="Typo.caption" OnClick="@(() => RemoveRoleUser(context.Item))" UserAttributes="@(new() { { "title", "点此去除该用户角色" } })">去除用户角色</MudLink>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</MudDataGrid>
+
+
+@code {
+    [Parameter]
+    public ApplicationRoleModel Role { get; set; } = new();
+    MudDataGrid<ApplicationUserModel>? _dataGrid;
+    List<ApplicationUserModel> _items = new List<ApplicationUserModel>();
+    List<ApplicationUserModel> _usersWithoutTheRole = new List<ApplicationUserModel>();
+    IReadOnlyCollection<ApplicationUserModel> _selectUsers = new HashSet<ApplicationUserModel>();
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (Role != null)
+        {
+            await LoadRoleUsers();
+        }
+    }
+
+    async Task LoadRoleUsers()
+    {
+        _items = await AccountService.GetRoleUsers(Role.Id);
+        _usersWithoutTheRole = await AccountService.GetUsersWithoutTheRole(Role.Id);
+    }
+
+    async Task RemoveRoleUser(ApplicationUserModel user)
+    {
+        var result = await AccountService.RemoveRoleUser(Role.Id, user.Id);
+        if (result.Success)
+        {
+            await LoadRoleUsers();
+        }
+    }
+
+    private string GetMultiSelectionText(IReadOnlyList<string> selectedValues)
+    {
+        if (selectedValues == null || !selectedValues.Any())
+            return "No users selected";
+
+        return string.Join(", ", selectedValues.Select(x => x));
+    }
+
+    async Task AddRoleUsers()
+    {
+        var result = await AccountService.AddRoleUsers(Role.Id, _selectUsers.ToList());
+        if (result.Success)
+        {
+            await LoadRoleUsers();
+            _selectUsers = new HashSet<ApplicationUserModel>();
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"分配角色到用户失败。({result.Code})");
+        }
+    }
+}

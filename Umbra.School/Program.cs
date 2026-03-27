@@ -62,6 +62,13 @@ builder.Services.AddIdentityCore<ApplicationUser>(options =>
     .AddSignInManager()
     .AddDefaultTokenProviders();
 
+// Zach 27-Mar-26: Configure identity's persistent cookies
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.ExpireTimeSpan = TimeSpan.FromDays(30); // Extend to 30 days
+    options.SlidingExpiration = true; // Refresh expiration on active use
+});
+
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 //  Zach 15-Feb-26:

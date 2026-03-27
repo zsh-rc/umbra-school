@@ -22,6 +22,8 @@ namespace Umbra.School.Shared
             #region Account
             CreateMap<ApplicationUser, ApplicationUserModel>().ReverseMap();
             CreateProjection<ApplicationUser, ApplicationUserModel>();
+            CreateMap<ApplicationRole, ApplicationRoleModel>().ReverseMap();
+            CreateProjection<ApplicationRole, ApplicationRoleModel>();
             #endregion
 
             #region English

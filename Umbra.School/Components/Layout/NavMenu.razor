@@ -13,17 +13,28 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">主页</MudNavLink>
     <AuthorizeView>
         <Authorized>
-            <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english")" Icon="@Icons.Material.Filled.Book">
-                <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
-                <MudNavLink Href="/english/words/shsp/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsp") ? "active" : "")" Icon="@Icons.Material.Filled.ShortText" title="高中词组">高中词组</MudNavLink>
-                <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shpsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="小学词汇">小学词汇</MudNavLink>
-                <MudNavLink Href="/english/words/shjhsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shjhsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="初中词汇">初中词汇</MudNavLink>
-                <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" Class="d-none">高中词组</MudNavLink>
-                <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译" Class="d-none">语句翻译</MudNavLink>
-                <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读" Class="d-none">时文阅读</MudNavLink>
+            <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english/")" Icon="@Icons.Material.Filled.Book">
+                <AuthorizeView Context="context_high" Roles="High School Students">
+                    <Authorized>
+                        <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
+                        <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" Class="d-none">高中词组</MudNavLink>
+                        <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译" Class="d-none">语句翻译</MudNavLink>
+                        <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读" Class="d-none">时文阅读</MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Context="context_elementary" Roles="Elementary School Students">
+                    <Authorized>
+                        <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shpsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="小学词汇">小学词汇</MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
+                <AuthorizeView Context="context_elementary" Roles="Junior High School Students">
+                    <Authorized>
+                        <MudNavLink Href="/english/words/shjhsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shjhsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="初中词汇">初中词汇</MudNavLink>
+                    </Authorized>
+                </AuthorizeView>
                 <MudNavLink Href="/english/words/unfamiliar/all" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("unfamiliar") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="我的生词库">我的生词库</MudNavLink>
                 <MudNavLink Href="/assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="英语词汇专项测试">英语词汇专项测试</MudNavLink>
-                <MudNavGroup Title="水平测试" Expanded="@IsExpanded("/assessment")" Icon="@Icons.Material.Filled.Assessment" Class="d-none">
+                <MudNavGroup Title="水平测试" Expanded="@IsExpanded("/assessment/")" Icon="@Icons.Material.Filled.Assessment" Class="d-none">
                     <MudNavLink Href="/assessment/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试" Class="d-none">词组专项测试</MudNavLink>
                     <MudNavLink Href="/assessment/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="翻译专项测试" Class="d-none">翻译专项测试</MudNavLink>
                     <MudNavLink Href="/assessment/english/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试" Class="d-none">综合测试</MudNavLink>
@@ -34,18 +45,14 @@
     </AuthorizeView>
     <AuthorizeView Roles="Administrators">
         <Authorized>
-            <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment")" Icon="@Icons.Material.Filled.Book">
-                <MudNavLink Href="/admin-assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>
-                <MudNavLink Href="/admin-assessment/english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试">审批测试</MudNavLink>
-                <MudNavGroup Title="英语词汇专项测试" Expanded="false" Icon="@Icons.Material.Filled.Book" Class="d-none">
-                </MudNavGroup>
+            <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment-english/")" Icon="@Icons.Material.Filled.Book">
+                <MudNavLink Href="/admin-assessment-english/words" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>
+                <MudNavLink Href="/admin-assessment-english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试">审批测试</MudNavLink>
             </MudNavGroup>
-            <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin")" Icon="@Icons.Material.Filled.Settings">
+            <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin/")" Icon="@Icons.Material.Filled.Settings">
                 <MudNavLink Href="/admin/users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">用户管理</MudNavLink>
                 <MudNavLink Href="/admin/roles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">角色管理</MudNavLink>
-                <MudNavLink Href="/admin/userroles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户角色管理">用户角色管理</MudNavLink>
             </MudNavGroup>
-            <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard" Target="_blank">后台管理面板 ↗</MudNavLink>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView>
@@ -76,6 +83,11 @@
             <MudNavLink Href="Account/Login" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Password" Class="d-none">Login</MudNavLink>
         </NotAuthorized>
     </AuthorizeView>
+    <AuthorizeView Roles="Administrators">
+        <Authorized>
+            <MudNavLink Href="/coravel/dashboard" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Dashboard" title="Job Dashboard" Target="_blank">后台管理面板 ↗</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
 </MudNavMenu>
 
 
@@ -97,7 +109,8 @@
     private bool IsExpanded(string hrefSegment)
     {
         // Checks if the current URL contains the path segment
-        return NavigationManager.Uri.Contains(hrefSegment, StringComparison.OrdinalIgnoreCase);
+        var expanded = NavigationManager.Uri.Contains(hrefSegment, StringComparison.OrdinalIgnoreCase);
+        return expanded;
     }
 
     private bool PageIsActive(string book)
