@@ -1,7 +1,105 @@
 ﻿@page "/chinese/classicals"
+@using Umbra.School.Models.Chinese
+@inject IChineseService ChineseService
 
-<h3>Classicals</h3>
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">高中语文实词 (实词：@_totalKeywords，出处：@_totalClassicals)</MudText>
+        <MudSpacer />
+        <MudForm>
+            <MudStack Style="width: 300px;" Row>
+                <MudTextField @bind-Value="@_searchKeyword" Label="查找关键词" Underline="false" OnKeyDown="@(async e => { if (e.Key == "Enter") await FindKeyWord(); })"
+                              Clearable="true" Immediate="true" ClearIcon="@Icons.Material.Filled.Close" OnClearButtonClick="FindKeyWord"
+                              AdornmentAriaLabel="Search" AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End"></MudTextField>
+            </MudStack>
+        </MudForm>
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudGrid>
+    <MudItem xs="3">
+        <MudTextField @bind-Value="@_searchKeyword" Label="查找实词" Underline="false" Class="mb-2" OnKeyDown="@(async e => { if (e.Key == "Enter") await FindKeyWord(); })"
+                      Clearable="true" Immediate="true" ClearIcon="@Icons.Material.Filled.Close" OnClearButtonClick="FindKeyWord"
+                      AdornmentIcon="@Icons.Material.Filled.Search" Adornment="Adornment.End" OnAdornmentClick="FindKeyWord"></MudTextField>
+        <MudSpacer />
+        <MudChipSet T="string" @bind-SelectedValue="_searchKeyword" CheckMark SelectionMode=" SelectionMode.SingleSelection" Style="height: calc(100vh - 220px); overflow-y:auto">
+            @foreach (var keyword in _keywords)
+            {
+                <MudBadge Content="@keyword.Count" Color="MudBlazor.Color.Inherit" Overlap="true" Class="mx-3 my-2">
+                    <MudChip T="string" Value="@keyword.Keyword" Variant="Variant.Text" Color="MudBlazor.Color.Info" OnClick="@(() => SearchClassicalsByKeyword(keyword.Keyword))">@keyword.Keyword</MudChip>
+                </MudBadge>
+            }
+        </MudChipSet>
+    </MudItem>
+    <MudItem xs="9">
+        <MudDataGrid T="ChineseClassicalModel" Items="@_classicals" MultiSelection="false" SelectOnRowClick="true" Dense="true"
+                     FixedHeader="true" Style="width:100%;" Height="calc(100vh - 230px)" Elevation="0" Groupable="true" GroupExpanded="true">
+            <NoRecordsContent>
+                <MudText Typo="Typo.subtitle1">请选择左侧的实词以查看相关的释义和出处。</MudText>
+            </NoRecordsContent>
+            <ToolBarContent>
+                <MudToolBar Dense="true">
+                    <MudText Typo="Typo.subtitle1" Style="font-weight:bold;">@($"实词：{_selectedKeyword ?? "请选择实词"}")</MudText>
+                    <MudSpacer />
+                </MudToolBar>
+            </ToolBarContent>
+            <GroupTemplate>
+                <MudText Typo="Typo.subtitle1" Style="font-weight:bold;">@context.Grouping.Key</MudText>
+            </GroupTemplate>
+            <Columns>
+                <PropertyColumn Property="x => x.Id" Title="#" Hidden="true"></PropertyColumn>
+                <PropertyColumn Property="x => x.KeywordMeaning" Title="释义" Sortable="true" Groupable="true" Grouping="true" Hidden="true"></PropertyColumn>
+                <PropertyColumn Property="x => x.Sentence" Title="释义 / 出处" Sortable="true"></PropertyColumn>
+            </Columns>
+        </MudDataGrid>
+    </MudItem>
+</MudGrid>
 
 @code {
+    private string? _searchString;
 
+    private MudDataGrid<CountByKeyWordModel> _keywordDataGrid = default!;
+    private List<CountByKeyWordModel> _keywords = new();
+    private int _totalKeywords;
+    private string? _searchKeyword;
+
+    private List<ChineseClassicalModel> _classicals = new();
+    private int _totalClassicals;
+    private string? _selectedKeyword;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadKeywords();
+    }
+
+    private async Task LoadKeywords()
+    {
+        _keywords = await ChineseService.GetChineseClassicalKeyWordsAsync();
+        _totalKeywords = _keywords.Count();
+        _classicals = await ChineseService.GetChineseClassicalsAsync();
+        _totalClassicals = _classicals.Count();
+    }
+
+    private async Task SearchClassicalsByKeyword(string keyword)
+    {
+        _selectedKeyword = keyword;
+        _classicals = await ChineseService.GetChineseClassicalsAsync(_selectedKeyword);
+    }
+
+    private async Task FindKeyWord()
+    {
+        if (!string.IsNullOrEmpty(_searchKeyword))
+        {
+            _keywords = _keywords.Where(k => k.Keyword.Contains(_searchKeyword, StringComparison.OrdinalIgnoreCase)).ToList();
+            await SearchClassicalsByKeyword(_searchKeyword);
+        }
+        else
+        {
+            await LoadKeywords();
+            _classicals.Clear();
+            _selectedKeyword = null;
+        }
+    }
 }

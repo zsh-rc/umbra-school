@@ -2,6 +2,18 @@
 {
     public static class UtilityHelper
     {
+        public static string GetFullName(string? firstName, string? lastName)
+        {
+            if (string.IsNullOrWhiteSpace(firstName) && string.IsNullOrWhiteSpace(lastName))
+                return string.Empty;
+            // Logic: If either name contains Chinese characters, use Chinese format
+            if (UtilityHelper.ContainsChinese(firstName!) || UtilityHelper.ContainsChinese(lastName!))
+            {
+                return $"{lastName}{firstName}"; // No space for Chinese names
+            }
+            return $"{firstName} {lastName}"; // Space for English names
+        }
+
         public static bool ContainsChinese(string text)
         {
             // Unicode range for Chinese characters

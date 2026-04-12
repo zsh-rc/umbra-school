@@ -16,7 +16,8 @@ namespace Umbra.School.Data.English
         [Required]
         public string Book { get; set; } = "SHSV"; // Shanghai High School Vocabulary
         public int Sort { get; set; }
+        public string? Examples { get; set; }
 
-        public ICollection<WordsAssessmentResult> UserRatings { get; set; } = new List<WordsAssessmentResult>();
+        public ICollection<UserEnglishWordRating> UserRatings { get; set; } = new List<UserEnglishWordRating>();
     }
 }

@@ -20,18 +20,13 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.5" />
-    <PackageReference Include="MudBlazor" Version="9.1.0" />
+    <PackageReference Include="MudBlazor" Version="9.3.0" />
     <PackageReference Include="Extensions.MudBlazor.StaticInput" Version="4.1.0" />
   </ItemGroup>
 
 
   <ItemGroup>
     <ProjectReference Include="..\Umbra.School.Data\Umbra.School.Data.csproj" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <Folder Include="Components\Pages\Account\" />
   </ItemGroup>
 
 </Project>

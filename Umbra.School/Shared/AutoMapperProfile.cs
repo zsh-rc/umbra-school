@@ -48,6 +48,13 @@ namespace Umbra.School.Shared
             #region Chinese
             CreateMap<ChineseClassicalQuestion, ChineseClassicalQuestionModel>().ReverseMap();
             CreateProjection<ChineseClassicalQuestion, ChineseClassicalQuestionModel>();
+            CreateMap<ChineseClassical, ChineseClassicalModel>()
+                .ForMember(dest => dest.Rating, opt => opt.MapFrom(src =>
+                    src.UserRatings
+                        .Where(ur => ur.UserId == userId)
+                        .Select(ur => ur.Rating)
+                        .FirstOrDefault()));
+            CreateMap<ChineseClassicalModel, ChineseClassical>();
             #endregion
             #region Assessment
             CreateMap<AssessmentInfo, AssessmentInfoModel>().ReverseMap();

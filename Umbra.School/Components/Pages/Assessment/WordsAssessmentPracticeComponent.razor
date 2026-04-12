@@ -1,5 +1,6 @@
 ﻿@using Umbra.School.Models.Assessment
 @inject IAssessmentService AssessmentService
+@inject IEnglishService EnglishService
 
 <MudCard>
     <MudCardHeader>
@@ -42,6 +43,10 @@
                         <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>
                         &nbsp;
                     </MudText>
+                    @if(!string.IsNullOrEmpty(context.Item.Examples))
+                    {
+                        <MudText Typo="Typo.caption" Color="MudBlazor.Color.Info">@context.Item.Examples</MudText>
+                    }
                 }
             </CellTemplate>
         </TemplateColumn>
@@ -64,6 +69,13 @@
                         <MudIcon Icon="@Icons.Material.Filled.Close" Color="MudBlazor.Color.Error" />
                     }
                 }
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn Title="熟练程度" Sortable="true" SortBy="X => X.UserRating">
+            <CellTemplate>
+                <MudRating Size="@MudBlazor.Size.Small"
+                           EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
+                           SelectedValue="@(context.Item.UserRating == null?0:context.Item.UserRating.Value)" SelectedValueChanged="@(val => Rating(context.Item, val))" />
             </CellTemplate>
         </TemplateColumn>
     </Columns>
@@ -113,5 +125,12 @@
     void ResetAll()
     {
         _hideCorrect = true;
+    }
+
+    async Task Rating(WordsAssessmentDetailModel detail, int val)
+    {
+        if (string.IsNullOrEmpty(CurrentUserId)) return;
+        var result = await EnglishService.RatingEnglishWord(CurrentUserId, detail.WordId, val);
+        StateHasChanged();
     }
 }

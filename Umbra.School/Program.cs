@@ -86,6 +86,8 @@ builder.Services.AddScoped<AppSnackbarService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 // Zach 3-Mar-26: Dashboard service for dashboard data retrieval
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+// Zach 28-Mar-26: Chinese Service for Chinese learning features
+builder.Services.AddScoped<IChineseService, ChineseService>();
 
 // Zach 18-Feb-26
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<ApplicationUser>, CustomClaimsPrincipalFactory>();

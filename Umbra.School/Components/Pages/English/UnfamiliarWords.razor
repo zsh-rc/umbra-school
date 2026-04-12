@@ -64,15 +64,20 @@
                     <MudRating Size="@MudBlazor.Size.Small"
                                EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
                                SelectedValue="@context.Item.Rating" SelectedValueChanged="@(val => Rating(context.Item, val))" />
-                    @* <MudButton Size="@MudBlazor.Size.Small" Variant="@Variant.Filled"
-                                   Color="@MudBlazor.Color.Default" StartIcon="@Icons.Material.Filled.Add"
-                                   Style="white-space: nowrap">备忘</MudButton> *@
                 </MudStack>
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Meaning" Title="中文释义" Sortable="true"></PropertyColumn>
     </Columns>
 </MudDataGrid>
+
+<script>
+    function playVoice(word) {
+        const url = "https://dict.youdao.com/dictvoice?audio="+word+"&type=2";
+        const audio = new Audio(url);
+        audio.play();
+    }
+</script>
 
 @code {
     [Parameter]
@@ -115,9 +120,9 @@
 
     async Task Rating(EnglishWordModel word, int val)
     {
-        var _currentUsername = (await UserProvider.GetUserAsync()).Username;
-        if (string.IsNullOrEmpty(_currentUsername)) return;
-        var result = await EnglishService.RatingEnglishWord(_currentUsername, word.Id, val);
+        var _currentUserId = (await UserProvider.GetUserAsync()).UserId;
+        if (string.IsNullOrEmpty(_currentUserId)) return;
+        var result = await EnglishService.RatingEnglishWord(_currentUserId, word.Id, val);
         StateHasChanged();
     }
 

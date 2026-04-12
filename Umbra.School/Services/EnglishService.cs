@@ -189,7 +189,7 @@ namespace Umbra.School.Services
                 var findRating = _context.UserEnglishWordRatings.FirstOrDefault(r => r.UserId == userId && r.WordId == wordId);
                 if (findRating == null)
                 {
-                    _context.Add(new WordsAssessmentResult()
+                    _context.Add(new UserEnglishWordRating()
                     {
                         Id = Guid.NewGuid(),
                         UserId = userId,

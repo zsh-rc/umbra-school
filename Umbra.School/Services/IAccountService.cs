@@ -7,6 +7,9 @@ namespace Umbra.School.Services
     public interface IAccountService
     {
         Task<List<ApplicationUserModel>> GetAllApplicationUsers();
+        Task<ApplicationUserModel> GetUser(string userId);
+        Task<ResponseModel<bool>> UpdateUser(ApplicationUserModel user);
+        Task<ResponseModel<bool>> ChangePassword(ChangePasswordModel model);
         Task<ResponseModel<string>> ResetPassword(string userId);
         Task<ResponseModel<bool>> ConfirmEmail(string userId);
         Task<ResponseModel<bool>> LockUser(string userId, bool locked);

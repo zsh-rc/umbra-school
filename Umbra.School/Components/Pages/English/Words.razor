@@ -55,13 +55,17 @@
             <CellTemplate>
                 <a href="javascript:void(0)" onclick="playVoice('@context.Item.Word');" title="发音">@context.Item.Word 🔊</a>&nbsp;
                 <a href="https://dict.youdao.com/result?word=@context.Item.Word&lang=en" title="查看详细解释" target="_blank">🔗</a>
+                @if (!string.IsNullOrEmpty(context.Item.Examples))
+                {
+                    <br/><MudText Typo="Typo.caption" Color="MudBlazor.Color.Info">@context.Item.Examples</MudText>
+                }
             </CellTemplate>
         </TemplateColumn>
         <TemplateColumn Title="熟练程度" Sortable="true" SortBy="X => X.Rating">
             <CellTemplate>
-                    <MudRating Size="@MudBlazor.Size.Small"
-                               EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
-                               SelectedValue="@context.Item.Rating" SelectedValueChanged="@(val => Rating(context.Item, val))" />                
+                <MudRating Size="@MudBlazor.Size.Small"
+                           EmptyIconColor="MudBlazor.Color.Surface" FullIconColor="MudBlazor.Color.Success"
+                           SelectedValue="@context.Item.Rating" SelectedValueChanged="@(val => Rating(context.Item, val))" />
             </CellTemplate>
         </TemplateColumn>
         <PropertyColumn Property="x => x.Meaning" Title="中文释义" Sortable="true"></PropertyColumn>

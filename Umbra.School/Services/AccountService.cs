@@ -195,6 +195,13 @@ namespace Umbra.School.Services
             return Task.FromResult(list);
         }
 
+        public Task<ApplicationUserModel> GetUser(string userId)
+        {
+            var uer = _context.Users.Where(u => u.Id == userId);
+            var model = _mapper.ProjectTo<ApplicationUserModel>(uer).FirstOrDefault();
+            return Task.FromResult(model);
+        }
+
         public async Task<List<ApplicationUserModel>> GetRoleUsers(string roleId)
         {
             var role = await _roleManager.FindByIdAsync(roleId);
@@ -408,6 +415,56 @@ namespace Umbra.School.Services
                 if (result.Succeeded)
                 {
                     return new ResponseModel<bool> { Success = true, Data = true, Code = "ROLE_UPDATED", Message = $"Role is updated." };
+                }
+                else
+                {
+                    var errorMessage = string.Empty;
+                    var errors = result.Errors;
+                    foreach (var error in errors)
+                    {
+                        errorMessage += $"{error.Description} ({error.Code}). ";
+                    }
+                    throw new Exception(errorMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel<bool> { Success = false, Data = false, Code = "UNKNOWN_ERROR", Message = $"Unknown error! ({ex})" };
+            }
+        }
+
+        public async Task<ResponseModel<bool>> UpdateUser(ApplicationUserModel user)
+        {
+            try
+            {
+                var existingUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+                if (existingUser == null)
+                {
+                    return new ResponseModel<bool> { Success = false, Data = false, Code = "USER_NOT_FOUND", Message = $"User is not found." };
+                }
+                // regenerate FullName by first and last name
+                user.FullName = UtilityHelper.GetFullName(user.FirstName, user.LastName);
+                _mapper.Map(user, existingUser);
+                _context.Users.Update(existingUser);
+                await _context.SaveChangesAsync();
+                return new ResponseModel<bool> { Success = true, Data = true, Code = "USER_UPDATED", Message = $"User is updated." };
+            }
+            catch (Exception ex)
+            {
+                return new ResponseModel<bool> { Success = false, Data = false, Code = "UNKNOWN_ERROR", Message = $"Unknown error! ({ex})" };
+            }
+        }
+
+        public async Task<ResponseModel<bool>> ChangePassword(ChangePasswordModel model)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(model.UserId);
+                if (user == null) throw new Exception("User is not found.");
+                var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.ConfirmPassword);
+                if (result.Succeeded)
+                {
+                    return new ResponseModel<bool> { Success = true, Data = true, Code = "PASSWORD_CHANGED", Message = $"Password is changed." };
                 }
                 else
                 {

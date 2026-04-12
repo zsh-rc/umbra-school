@@ -353,7 +353,7 @@ namespace Umbra.School.Services
                     uwr => new { uwr.UserId, uwr.WordId },
                     (r, uwr) => new WordsAssessmentDetailModel
                     {
-                        Id = r.wad.Id,
+                        Id = r.wad.Id,                        
                         Meaning = r.wad.Meaning,
                         UserId = r.wad.UserId,
                         WordId = r.wad.WordId,
@@ -361,7 +361,8 @@ namespace Umbra.School.Services
                         Correct = r.wad.Correct,
                         WordsAssessementId = r.wad.WordsAssessementId,
                         Word = r.wad.Word,
-                        UserRating = uwr != null ? uwr.Rating : 0
+                        UserRating = uwr != null ? uwr.Rating : 0,
+                        Examples = r.ew.Examples
                     })
                 .OrderBy(d => d.Word).ToList();
             //var list = _mapper.ProjectTo<WordsAssessmentDetailModel>(query).ToList();

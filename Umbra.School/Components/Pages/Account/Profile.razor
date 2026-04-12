@@ -1,0 +1,67 @@
+﻿@page "/account/profile"
+@using Microsoft.AspNetCore.Identity
+@using Umbra.School.Components.Account
+@using Umbra.School.Models.Account
+@inject UserProvider UserProvider
+@inject IAccountService AccountService
+@inject AppSnackbarService AppSnackbarService
+
+<MudPaper Elevation="0" Class="transparent-bg mb-3" Square="true">
+    <MudToolBar Dense="true">
+        <MudText Typo="Typo.h6" Style="font-weight:bold;">我的资料</MudText>
+        <MudSpacer />
+    </MudToolBar>
+    <MudDivider DividerType="DividerType.FullWidth" />
+</MudPaper>
+
+<MudPaper Class="pa-3" Elevation="0">
+    <MudGrid>
+        <MudItem xs="6">
+            <MudForm Model="User">
+                <MudTextField T="string" Label="用户名" For="@(() => User.UserName)" @bind-Value="@User.UserName" Underline="false" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Person"
+                              ReadOnly="true" Placeholder="请输入您的用户名。" UserAttributes="@(new() { { "autocomplete", "off" } })" />
+                <MudTextField T="string" Label="联系电话" For="@(() => User.PhoneNumber)" @bind-Value="@User.PhoneNumber" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Phone" AdornmentColor="MudBlazor.Color.Primary"
+                              Placeholder="请输入您的联系电话。" UserAttributes="@(new() { { "autocomplete", "tel-national" } })" />
+                <MudTextField T="string" Label="姓" For="@(() => User.LastName)" @bind-Value="@User.LastName" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="MudBlazor.Color.Primary"
+                              Placeholder="请输入您的姓。" UserAttributes="@(new() { { "autocomplete", "off" } })" />
+                <MudTextField T="string" Label="名" For="@(() => User.FirstName)" @bind-Value="@User.FirstName" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Abc" AdornmentColor="MudBlazor.Color.Primary"
+                              Placeholder="请输入您的名。" UserAttributes="@(new() { { "autocomplete", "off" } })" />
+                <MudTextField T="string" Label="全名" For="@(() => User.FullName)" @bind-Value="@User.FullName" ReadOnly="true" Underline="false" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Abc"
+                              Placeholder="请输入您的姓名。" UserAttributes="@(new() { { "autocomplete", "off" } })" />
+                <MudButton StartIcon="@Icons.Material.Filled.Save" Variant="Variant.Filled" Color="MudBlazor.Color.Primary" FullWidth="true" Class="mt-5"
+                           OnClick="UpdateUser">保存资料</MudButton>
+            </MudForm>
+        </MudItem>
+        <MudItem xs="6"></MudItem>
+    </MudGrid>
+</MudPaper>
+
+@code {
+    ApplicationUserModel User = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await UserProvider.GetUserAsync();
+        var userId = user.UserId;
+        await GetCurrentUserInfo(userId);
+    }
+
+    async Task GetCurrentUserInfo(string userId)
+    {
+        User = await AccountService.GetUser(userId);
+    }
+
+    async Task UpdateUser()
+    {
+        var result = await AccountService.UpdateUser(User);
+        if (result.Success)
+        {
+            AppSnackbarService.ShowSuccess($"资料更新成功。");
+            await GetCurrentUserInfo(User.Id);
+        }
+        else
+        {
+            AppSnackbarService.ShowError($"资料更新失败。{result.Message}");
+        }
+    }
+}

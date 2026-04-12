@@ -22,8 +22,10 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<EnglishWord> EnglishWords { get; set; }
     public DbSet<EnglishPhrase> EnglishPhrases { get; set; }
     public DbSet<EnglishTranslation> EnglishTranslations { get; set; }
-    public DbSet<WordsAssessmentResult> UserEnglishWordRatings { get; set; }
+    public DbSet<UserEnglishWordRating> UserEnglishWordRatings { get; set; }
     public DbSet<UserEnglishPhraseRating> UserEnglishPhraseRatings { get; set; }
+    public DbSet<ChineseClassical> ChineseClassicals { get; set; }
+    public DbSet<UserChineseClassicalRating> UserChineseClassicalRatings { get; set; }
     public DbSet<ChineseClassicalQuestion> ChineseClassicalQuestions { get; set; }
     public DbSet<AssessmentInfo> AssessmentInfos { get; set; }
     public DbSet<AssessmentResult> AssessmentResults { get; set; }

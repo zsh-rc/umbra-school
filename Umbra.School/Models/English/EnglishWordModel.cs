@@ -11,5 +11,6 @@ namespace Umbra.School.Models.English
         public string? Remark { get; set; }
         public int Rating { get; set; }
         public int Sort { get; set; }
+        public string? Examples { get; set; }
     }
 }

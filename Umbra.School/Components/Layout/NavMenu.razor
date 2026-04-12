@@ -13,53 +13,65 @@
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">主页</MudNavLink>
     <AuthorizeView>
         <Authorized>
-            <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english/")" Icon="@Icons.Material.Filled.Book">
+            <MudNavGroup Title="英语课程" Expanded="@IsExpanded("/english/")" Icon="@Icons.Material.Filled.Explicit" IconColor="@MudBlazor.Color.Inherit">
                 <AuthorizeView Context="context_high" Roles="High School Students">
                     <Authorized>
-                        <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇">高中词汇</MudNavLink>
-                        <MudNavLink Href="/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" Class="d-none">高中词组</MudNavLink>
-                        <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译" Class="d-none">语句翻译</MudNavLink>
-                        <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读" Class="d-none">时文阅读</MudNavLink>
+                        <MudNavLink Href="/english/words/shsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="高中词汇" IconColor="@MudBlazor.Color.Inherit">高中词汇</MudNavLink>
+                        <MudNavLink Href="/english/words/shsp/a" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="高中词组" IconColor="@MudBlazor.Color.Inherit">高中词组</MudNavLink>
+                        <MudNavLink Href="/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="语句翻译" Class="d-none" IconColor="@MudBlazor.Color.Inherit">语句翻译</MudNavLink>
+                        <MudNavLink Href="/english/readings" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Newspaper" title="时文阅读" Class="d-none" IconColor="@MudBlazor.Color.Inherit">时文阅读</MudNavLink>
                     </Authorized>
                 </AuthorizeView>
                 <AuthorizeView Context="context_elementary" Roles="Elementary School Students">
                     <Authorized>
-                        <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shpsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="小学词汇">小学词汇</MudNavLink>
+                        <MudNavLink Href="/english/words/shpsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shpsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="小学词汇" IconColor="@MudBlazor.Color.Inherit">小学词汇</MudNavLink>
                     </Authorized>
                 </AuthorizeView>
                 <AuthorizeView Context="context_elementary" Roles="Junior High School Students">
                     <Authorized>
-                        <MudNavLink Href="/english/words/shjhsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shjhsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="初中词汇">初中词汇</MudNavLink>
+                        <MudNavLink Href="/english/words/shjhsv/a" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("shjhsv") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="初中词汇" IconColor="@MudBlazor.Color.Inherit">初中词汇</MudNavLink>
                     </Authorized>
                 </AuthorizeView>
-                <MudNavLink Href="/english/words/unfamiliar/all" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("unfamiliar") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="我的生词库">我的生词库</MudNavLink>
-                <MudNavLink Href="/assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Abc" title="英语词汇专项测试">英语词汇专项测试</MudNavLink>
-                <MudNavGroup Title="水平测试" Expanded="@IsExpanded("/assessment/")" Icon="@Icons.Material.Filled.Assessment" Class="d-none">
-                    <MudNavLink Href="/assessment/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试" Class="d-none">词组专项测试</MudNavLink>
-                    <MudNavLink Href="/assessment/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="翻译专项测试" Class="d-none">翻译专项测试</MudNavLink>
-                    <MudNavLink Href="/assessment/english/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试" Class="d-none">综合测试</MudNavLink>
+                <MudNavLink Href="/english/words/unfamiliar/all" Match="NavLinkMatch.Prefix" Class="@(PageIsActive("unfamiliar") ? "active" : "")" Icon="@Icons.Material.Filled.Abc" title="我的生词库" IconColor="@MudBlazor.Color.Inherit">我的生词库</MudNavLink>
+                <MudNavLink Href="/assessment/english/words" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Quiz" title="英语词汇专项测试" IconColor="@MudBlazor.Color.Inherit">英语词汇专项测试</MudNavLink>
+                <MudNavGroup Title="水平测试" Expanded="@IsExpanded("/assessment/")" Icon="@Icons.Material.Filled.Assessment" Class="d-none" IconColor="@MudBlazor.Color.Inherit">
+                    <MudNavLink Href="/assessment/english/phrases" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="词组专项测试" Class="d-none" IconColor="@MudBlazor.Color.Inherit">词组专项测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/translations" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.TextSnippet" title="翻译专项测试" Class="d-none" IconColor="@MudBlazor.Color.Inherit">翻译专项测试</MudNavLink>
+                    <MudNavLink Href="/assessment/english/combined" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.PresentToAll" title="综合测试" Class="d-none" IconColor="@MudBlazor.Color.Inherit">综合测试</MudNavLink>
                 </MudNavGroup>
             </MudNavGroup>
-            <MudNavLink Href="/chinese/classicals" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.LibraryBooks" title="语文实词" Class="d-none">语文实词</MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="High School Students">
+        <Authorized>
+            <MudNavLink Href="/chinese/classicals" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Translate" title="高中语文实词" IconColor="@MudBlazor.Color.Inherit">高中语文实词</MudNavLink>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView Roles="Administrators">
         <Authorized>
-            <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment-english/")" Icon="@Icons.Material.Filled.Book">
-                <MudNavLink Href="/admin-assessment-english/words" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划">制定测试计划</MudNavLink>
-                <MudNavLink Href="/admin-assessment-english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试">审批测试</MudNavLink>
+            <MudNavGroup Title="测试管理" Expanded="@IsExpanded("/admin-assessment-english/")" Icon="@Icons.Material.Filled.AdminPanelSettings" IconColor="@MudBlazor.Color.Inherit">
+                <MudNavLink Href="/admin-assessment-english/words" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.NewLabel" title="制定测试计划" IconColor="@MudBlazor.Color.Inherit">制定测试计划</MudNavLink>
+                <MudNavLink Href="/admin-assessment-english/words/review" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Grading" title="审批测试" IconColor="@MudBlazor.Color.Inherit">审批测试</MudNavLink>
             </MudNavGroup>
-            <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin/")" Icon="@Icons.Material.Filled.Settings">
-                <MudNavLink Href="/admin/users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">用户管理</MudNavLink>
-                <MudNavLink Href="/admin/roles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理">角色管理</MudNavLink>
+            <MudNavGroup Title="系统管理" Expanded="@IsExpanded("/admin/")" Icon="@Icons.Material.Filled.Settings" IconColor="@MudBlazor.Color.Inherit">
+                <TitleContent>
+                    <MudText Typo="Typo.subtitle2" Color="MudBlazor.Color.Inherit">系统管理</MudText>
+                </TitleContent>
+                <ChildContent>
+                    <MudNavLink Href="/admin/users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.AdminPanelSettings" title="用户管理" IconColor="@MudBlazor.Color.Inherit">用户管理</MudNavLink>
+                    <MudNavLink Href="/admin/roles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Group" title="角色管理" IconColor="@MudBlazor.Color.Inherit">角色管理</MudNavLink>
+                </ChildContent>
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView>
         <Authorized>
-            <MudNavGroup Title="我的账户" Expanded="@IsExpanded("/account/manage")" Icon="@Icons.Material.Filled.Person2">
-                <MudNavLink Href="/account/manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DocumentScanner" title="我的资料">我的资料</MudNavLink>
-                <MudNavLink Href="/account/manage/changepassword" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Password" title="修改密码">修改密码</MudNavLink>
+            <MudNavGroup Title="我的账户" Expanded="@IsExpanded("/account/")" Icon="@Icons.Material.Filled.Person2">
+                <MudNavLink Href="/account/profile" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.DocumentScanner" title="我的资料" IconColor="@MudBlazor.Color.Inherit">我的资料</MudNavLink>
+                <MudNavLink Href="/account/change-password" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Password" title="修改密码" IconColor="@MudBlazor.Color.Inherit">修改密码</MudNavLink>
+
+                @* <MudNavLink Href="/account/manage" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.DocumentScanner" title="我的资料">我的资料</MudNavLink> *@
+                @* <MudNavLink Href="/account/manage/changepassword" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Password" title="修改密码">修改密码</MudNavLink> *@
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>
